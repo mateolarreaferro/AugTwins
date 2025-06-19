@@ -1,0 +1,18 @@
+# Ignore virtual environment
+venv/
+
+# Ignore secret settings file
+settings.py
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Editor files
+.vscode/
+*.swp
+
+# macOS system file
+.DS_Store
