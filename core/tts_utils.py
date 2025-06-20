@@ -9,7 +9,7 @@ import requests
 from uuid import uuid4
 from typing import Optional
 
-# key import or env fallback -----------------------------------
+# key import or env fallback 
 try:
     from settings import ELEVEN_API_KEY as _ELEVEN_KEY
 except (ModuleNotFoundError, ImportError):
@@ -19,7 +19,7 @@ except (ModuleNotFoundError, ImportError):
         _ELEVEN_KEY = os.getenv("ELEVEN_API_KEY", "") or os.getenv("ELEVENLABS_API_KEY", "")
 
 
-# main helper ---------------------------------------------------
+# main helper
 def speak(text: str, voice_id: str, *, playback_cmd: str = "afplay") -> None:
     """
     Download TTS audio from ElevenLabs and play it via *playback_cmd*.

@@ -10,12 +10,12 @@ from typing import List, Sequence
 import requests
 from sentence_transformers import SentenceTransformer, util
 
-import llm_utils                   # OpenAI wrapper
-import tts_utils
-from . import memory_utils as mu    # persistence / summarisation
+from . import llm_utils  
+from . import tts_utils
+from . import memory_utils as mu 
 
 
-# ── ElevenLabs key (settings.py → env fallback) ───────────────
+# ElevenLabs key (settings.py → env fallback)
 try:
     from settings import ELEVEN_API_KEY as _ELEVEN_KEY
 except (ModuleNotFoundError, ImportError):
@@ -24,7 +24,7 @@ except (ModuleNotFoundError, ImportError):
     except (ModuleNotFoundError, ImportError):
         _ELEVEN_KEY = os.getenv("ELEVEN_API_KEY", "") or os.getenv("ELEVENLABS_API_KEY", "")
 
-# ── Shared embedder ───────────────────────────────────────────
+# Shared embedder
 _EMBEDDER = SentenceTransformer("all-MiniLM-L6-v2")
 
 
@@ -43,7 +43,7 @@ class Agent:
     tts_voice_id: str
     memory: List[Memory] = field(default_factory=list)
 
-    # ── Embedding helpers ────────────────────────────────────
+    # ── Embedding helpers 
     def _ensure_embeddings(self, mems: Sequence[Memory]) -> None:
         missing = [m for m in mems if not m.embedding]
         if missing:
@@ -51,7 +51,7 @@ class Agent:
             for m, v in zip(missing, vecs):
                 m.embedding = v.tolist()
 
-    # ── Memory CRUD & roll-up ───────────────────────────────
+    # Memory CRUD & roll-up
     _MAX_RAW = 200
     _CHUNK   = 50
 
@@ -76,7 +76,7 @@ class Agent:
             self.memory = [m for m in self.memory if m not in oldest]
             self.add_memory(f"(summary) {summary}", is_summary=True)
 
-    # ── Retrieval ───────────────────────────────────────────
+    # Retrieval
     def retrieve_memories(self, query: str, top_k: int = 5) -> List[str]:
         if not self.memory:
             return []
@@ -86,7 +86,7 @@ class Agent:
         scored.sort(key=lambda t: t[0], reverse=True)
         return [m.text for _, m in scored[:top_k]]
 
-    # ── LLM response ────────────────────────────────────────
+    # LLM response
     def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
         relevant = "\n".join(self.retrieve_memories(user_msg))
         prompt = (
@@ -99,7 +99,7 @@ class Agent:
         self.add_memory(f"User: {user_msg}\n{self.name}: {answer}")
         return answer
 
-       # ── Speech synthesis (delegates to tts_utils) ─────────────────────────
+       # Speech synthesis (delegates to tts_utils)
     def speak(self, text: str, playback_cmd: str = "afplay") -> None:
         """
         Convert *text* into audible speech via ElevenLabs.
@@ -109,7 +109,6 @@ class Agent:
         this agent’s `tts_voice_id` is missing, the helper simply prints a
         notice and returns, so callers don’t need a try/except.
         """
-        import tts_utils                       # local import avoids cycles
+        from . import tts_utils                       # local import avoids cycles
         tts_utils.speak(text, voice_id=self.tts_voice_id,
                         playback_cmd=playback_cmd)
-

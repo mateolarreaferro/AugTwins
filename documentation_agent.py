@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Interactive GPT-powered code assistant.
 
@@ -9,24 +8,24 @@ import argparse
 from pathlib import Path
 from typing import Dict
 
-from llm_utils import gen_oai   # uses the helper we just added
+from core.llm_utils import gen_oai  
 
 try:
-    import readline             # nicer arrow-key history on mac/linux
-except ImportError:             # Windows fallback
+    import readline         
+except ImportError:             
     import pyreadline3 as readline
 
 
 
-# Adapt these paths to YOUR current repo layout
+# This is what determines what context the agent has
 SOURCE_FILES = [
     "app.py",
     "settings.py",
-    "llm_utils.py",
+    "core/llm_utils.py",
     "core/agent.py",
     "core/memory_utils.py",
-    "agents/alex.py",
-    "agents/nina.py",
+    "seeds/alex.py",
+    "seeds/nina.py",
 ]
 
 
@@ -59,7 +58,7 @@ def ask_codebase(
     model: str, temp: float
 ) -> str:
     """Append user question, call GPT, append assistant reply, return reply."""
-    if not history:   # first turn → prepend system prompt
+    if not history: 
         history.append({"role": "system", "content": make_system_prompt(code_map)})
 
     history.append({"role": "user", "content": question})

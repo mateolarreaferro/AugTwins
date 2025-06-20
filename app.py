@@ -1,6 +1,8 @@
-"""Terminal chat launcher for the Digital-Twins agents."""
-from agents.alex import alex
-from agents.nina import nina
+"""Terminal chat launcher for AugTwins."""
+# Agents
+from seeds.alex import alex
+from seeds.nina import nina
+
 from core.memory_utils import load_memories, save_memories, summarize_recent
 
 # Reload persisted memories

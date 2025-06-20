@@ -8,3 +8,4 @@ alex = Agent(
 
 # Seed memory (merged with saved JSON on load)
 alex.add_memory("I enjoy reading philosophy and taking quiet evening walks.")
+alex.add_memory("people call me the bug. I am argentinian. I study neuroscience")

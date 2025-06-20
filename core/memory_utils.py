@@ -10,14 +10,12 @@ import json
 from pathlib import Path
 from typing import List, TYPE_CHECKING
 
-import llm_utils
+from . import llm_utils
 
-# ------------------------------------------------------------------
 # Optional forward references for static type checkers only
 if TYPE_CHECKING:          # <- evaluated by tools like mypy, ignored at runtime
     from .agent import Agent, Memory
 
-# ------------------------------------------------------------------
 # storage path
 _DIR = Path("memories")
 _DIR.mkdir(exist_ok=True)
@@ -27,7 +25,6 @@ def _path(name: str) -> Path:
     return _DIR / f"{name.lower()}_memories.json"
 
 
-# ------------------------------------------------------------------
 # save / load
 def save_memories(agent: "Agent") -> None:          # quotes avoid runtime eval
     with _path(agent.name).open("w", encoding="utf-8") as f:
@@ -48,7 +45,6 @@ def load_memories(name: str) -> List["Memory"]:
     return [Memory(**d) for d in data]
 
 
-# ------------------------------------------------------------------
 # summarisation helpers
 def llm_summarise_block(
     block: str,
