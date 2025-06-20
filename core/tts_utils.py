@@ -43,3 +43,4 @@ def speak(text: str, voice_id: str, *, playback_cmd: str = "afplay") -> None:
     with open(fname, "wb") as f:
         f.write(r.content)
     os.system(f"{playback_cmd} {fname}")
+    os.remove(fname)
