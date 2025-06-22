@@ -51,6 +51,24 @@ class Agent:
     personality: str
     tts_voice_id: str
     memory: List[Memory] = field(default_factory=list)
+    _sync_every: int = 5
+    _unsynced_count: int = 0
+
+    def sync_memories(self) -> None:
+        """Persist current memories to disk or Mem0 and reset counter."""
+        mu.save_memories(self)
+        self._unsynced_count = 0
+
+    def _maybe_sync(self) -> None:
+        self._unsynced_count += 1
+        if self._unsynced_count >= self._sync_every:
+            self.sync_memories()
+
+    def trim_memory(self, limit: int) -> None:
+        """Keep only the most recent *limit* memories and sync."""
+        if len(self.memory) > limit:
+            self.memory = self.memory[-limit:]
+            self.sync_memories()
 
     # ── Embedding helpers 
     def _ensure_embeddings(self, mems: Sequence[Memory]) -> None:
@@ -80,6 +98,7 @@ class Agent:
             is_summary=is_summary,
         )
         self.memory.append(mem)
+        self._maybe_sync()
         if _MEM0_KEY and requests:
             headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
             payload = mem.__dict__ | {"agent": self.name}
@@ -106,6 +125,7 @@ class Agent:
 
     # Retrieval
     def retrieve_memories(self, query: str, top_k: int = 5) -> List[str]:
+        results: List[str] = []
         if _MEM0_KEY and requests:
             headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
             payload = {"query": query, "k": top_k, "agent": self.name}
@@ -114,17 +134,26 @@ class Agent:
                     "https://api.mem0.ai/v1/search", json=payload, headers=headers, timeout=30
                 )
                 r.raise_for_status()
-                return r.json().get("results", [])
+                results = r.json().get("results", [])
             except Exception as e:
                 print("[Mem0 search error]", e)
 
-        if not self.memory:
-            return []
-        self._ensure_embeddings(self.memory)
-        q_vec = _EMBEDDER.encode(query)
-        scored = [(float(util.cos_sim(q_vec, m.embedding)), m) for m in self.memory]
-        scored.sort(key=lambda t: t[0], reverse=True)
-        return [m.text for _, m in scored[:top_k]]
+        local_results: List[str] = []
+        if self.memory:
+            self._ensure_embeddings(self.memory)
+            q_vec = _EMBEDDER.encode(query)
+            scored = [(float(util.cos_sim(q_vec, m.embedding)), m) for m in self.memory]
+            scored.sort(key=lambda t: t[0], reverse=True)
+            local_results = [m.text for _, m in scored[:top_k]]
+
+        # Merge remote and local results, prioritising remote
+        merged: List[str] = []
+        for txt in results + local_results:
+            if txt not in merged:
+                merged.append(txt)
+            if len(merged) >= top_k:
+                break
+        return merged
 
     # LLM response
     def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
