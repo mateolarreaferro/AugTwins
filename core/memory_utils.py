@@ -57,6 +57,9 @@ def save_memories(agent: "Agent") -> None:          # quotes avoid runtime eval
             r.raise_for_status()
         except Exception as e:
             print("[Mem0 save error]", e)
+            # Fallback to local persistence if remote fails
+            with _path(agent.name).open("w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
     else:
         with _path(agent.name).open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
