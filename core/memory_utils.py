@@ -7,8 +7,14 @@ This version avoids circular-import problems by:
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import List, TYPE_CHECKING
+
+try:
+    import requests
+except ModuleNotFoundError:  # allow tests without requests installed
+    requests = None
 
 from . import llm_utils
 
@@ -16,19 +22,44 @@ from . import llm_utils
 if TYPE_CHECKING:          # <- evaluated by tools like mypy, ignored at runtime
     from .agent import Agent, Memory
 
+# Mem0 API key lookup
+try:
+    from settings import MEM0_API_KEY as _MEM0_KEY
+except (ModuleNotFoundError, ImportError):
+    _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
+
+_BASE_URL = "https://api.mem0.ai/v1"
+
 # storage path
 _DIR = Path("memories")
 _DIR.mkdir(exist_ok=True)
+
+
+def _use_remote() -> bool:
+    return bool(_MEM0_KEY and requests)
 
 
 def _path(name: str) -> Path:
     return _DIR / f"{name.lower()}_memories.json"
 
 
+def _remote_url(name: str) -> str:
+    return f"{_BASE_URL}/agents/{name.lower()}/memories"
+
+
 # save / load
 def save_memories(agent: "Agent") -> None:          # quotes avoid runtime eval
-    with _path(agent.name).open("w", encoding="utf-8") as f:
-        json.dump([m.__dict__ for m in agent.memory], f, ensure_ascii=False, indent=2)
+    data = [m.__dict__ for m in agent.memory]
+    if _use_remote():
+        headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
+        try:
+            r = requests.post(_remote_url(agent.name), json=data, headers=headers, timeout=30)
+            r.raise_for_status()
+        except Exception as e:
+            print("[Mem0 save error]", e)
+    else:
+        with _path(agent.name).open("w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 def load_memories(name: str) -> List["Memory"]:
@@ -37,11 +68,20 @@ def load_memories(name: str) -> List["Memory"]:
     Called only after core.agent has finished initialising.
     """
     from .agent import Memory   # deferred import – safe now
-    p = _path(name)
-    if not p.exists():
-        return []
-    with p.open("r", encoding="utf-8") as f:
-        data = json.load(f)
+    data = []
+    if _use_remote():
+        headers = {"Authorization": f"Bearer {_MEM0_KEY}"}
+        try:
+            r = requests.get(_remote_url(name), headers=headers, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+        except Exception as e:
+            print("[Mem0 load error]", e)
+    if not data:
+        p = _path(name)
+        if p.exists():
+            with p.open("r", encoding="utf-8") as f:
+                data = json.load(f)
     return [Memory(**d) for d in data]
 
 
@@ -52,6 +92,16 @@ def llm_summarise_block(
     agent_name: str,
     model: str = "gpt-4o-mini",
 ) -> str:
+    if _use_remote():
+        headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
+        payload = {"text": block, "agent": agent_name}
+        try:
+            r = requests.post(f"{_BASE_URL}/summarize", json=payload, headers=headers, timeout=30)
+            r.raise_for_status()
+            return r.json().get("summary", "")
+        except Exception as e:
+            print("[Mem0 summarise error]", e)
+
     prompt = (
         f"You are helping {agent_name} condense memories.\n"
         "Rewrite the following block into 3–4 concise sentences:\n\n"
