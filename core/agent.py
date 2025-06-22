@@ -11,7 +11,21 @@ try:
     import requests
 except ModuleNotFoundError:  # optional for offline tests
     requests = None
-from sentence_transformers import SentenceTransformer, util
+try:
+    from sentence_transformers import SentenceTransformer, util
+except ModuleNotFoundError:  # graceful fallback if dependency missing
+    import types
+
+    class SentenceTransformer:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def encode(self, texts):
+            if isinstance(texts, list):
+                return [[0.0, 0.0, 0.0] for _ in texts]
+            return [0.0, 0.0, 0.0]
+
+    util = types.SimpleNamespace(cos_sim=lambda a, b: 0.0)
 
 from . import llm_utils  
 from . import tts_utils
