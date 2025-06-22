@@ -5,7 +5,10 @@ Keeps all voice-specific networking in one place.
 """
 from __future__ import annotations
 import os
-import requests
+try:
+    import requests
+except ModuleNotFoundError:  # allow tests without requests
+    requests = None
 from uuid import uuid4
 from typing import Optional
 
@@ -25,7 +28,7 @@ def speak(text: str, voice_id: str, *, playback_cmd: str = "afplay") -> None:
     Download TTS audio from ElevenLabs and play it via *playback_cmd*.
     No-ops if keys or voice_id are missing.
     """
-    if not _ELEVEN_KEY or not voice_id:
+    if not _ELEVEN_KEY or not voice_id or not requests:
         print("[TTS disabled – set ELEVEN_API_KEY / ELEVENLABS_API_KEY and voice ID]")
         return
 

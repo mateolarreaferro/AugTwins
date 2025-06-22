@@ -7,12 +7,21 @@ from uuid import uuid4
 from dataclasses import dataclass, field
 from typing import List, Sequence
 
-import requests
+try:
+    import requests
+except ModuleNotFoundError:  # optional for offline tests
+    requests = None
 from sentence_transformers import SentenceTransformer, util
 
 from . import llm_utils  
 from . import tts_utils
-from . import memory_utils as mu 
+from . import memory_utils as mu
+
+# Mem0 key for remote memory operations
+try:
+    from settings import MEM0_API_KEY as _MEM0_KEY
+except (ModuleNotFoundError, ImportError):
+    _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
 
 
 # ElevenLabs key (settings.py → env fallback)
@@ -49,21 +58,40 @@ class Agent:
         if missing:
             vecs = _EMBEDDER.encode([m.text for m in missing])
             for m, v in zip(missing, vecs):
-                m.embedding = v.tolist()
+                if hasattr(v, "tolist"):
+                    m.embedding = v.tolist()
+                else:
+                    m.embedding = list(v)
 
     # Memory CRUD & roll-up
     _MAX_RAW = 200
     _CHUNK   = 50
 
     def add_memory(self, text: str, *, is_summary: bool = False) -> None:
-        self.memory.append(
-            Memory(
-                text=text,
-                timestamp=time.time(),
-                embedding=_EMBEDDER.encode(text).tolist(),
-                is_summary=is_summary,
-            )
+        emb = _EMBEDDER.encode(text)
+        if hasattr(emb, "tolist"):
+            emb = emb.tolist()
+        else:
+            emb = list(emb)
+        mem = Memory(
+            text=text,
+            timestamp=time.time(),
+            embedding=emb,
+            is_summary=is_summary,
         )
+        self.memory.append(mem)
+        if _MEM0_KEY and requests:
+            headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
+            payload = mem.__dict__ | {"agent": self.name}
+            try:
+                requests.post(
+                    "https://api.mem0.ai/v1/memory",
+                    json=payload,
+                    headers=headers,
+                    timeout=30,
+                )
+            except Exception as e:
+                print("[Mem0 add_memory error]", e)
         self._auto_rollup()
 
     def _auto_rollup(self) -> None:
@@ -78,6 +106,18 @@ class Agent:
 
     # Retrieval
     def retrieve_memories(self, query: str, top_k: int = 5) -> List[str]:
+        if _MEM0_KEY and requests:
+            headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
+            payload = {"query": query, "k": top_k, "agent": self.name}
+            try:
+                r = requests.post(
+                    "https://api.mem0.ai/v1/search", json=payload, headers=headers, timeout=30
+                )
+                r.raise_for_status()
+                return r.json().get("results", [])
+            except Exception as e:
+                print("[Mem0 search error]", e)
+
         if not self.memory:
             return []
         self._ensure_embeddings(self.memory)

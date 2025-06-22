@@ -6,7 +6,10 @@ from __future__ import annotations
 import os
 from typing import List, Dict, Optional
 
-from openai import OpenAI
+try:
+    from openai import OpenAI
+except ModuleNotFoundError:  # allow tests without openai installed
+    OpenAI = None
 
 # API key
 try:
@@ -14,7 +17,10 @@ try:
 except (ModuleNotFoundError, ImportError):
     _OPENAI_KEY = os.getenv("OPENAI_API_KEY", "")
 
-client = OpenAI(api_key=_OPENAI_KEY)
+if OpenAI:
+    client = OpenAI(api_key=_OPENAI_KEY)
+else:
+    client = None
 
 
 def chat(
@@ -25,6 +31,8 @@ def chat(
     max_tokens: Optional[int] = None,
 ) -> str:
     """Basic wrapper that returns *only* the assistant reply string."""
+    if not client:
+        raise RuntimeError("OpenAI client unavailable")
     resp = client.chat.completions.create(
         model=model,
         messages=messages,
