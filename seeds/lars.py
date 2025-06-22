@@ -14,7 +14,7 @@ SEED_MEMORIES["combined"] = SEED_MEMORIES["interview"] + SEED_MEMORIES["web"]
 lars = Agent(
     name="Lars",
     personality="Immersive experiences student who loves classic music.",
-    tts_voice_id="",
+    tts_voice_id="1t1EeRixsJrKbiF1zwM6",
 )
 for txt in SEED_MEMORIES["combined"]:
     lars.add_memory(txt)

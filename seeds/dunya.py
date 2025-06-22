@@ -14,7 +14,7 @@ SEED_MEMORIES["combined"] = SEED_MEMORIES["interview"] + SEED_MEMORIES["web"]
 dunya = Agent(
     name="Dünya",
     personality="Researcher focused on digital twins and human augmentation.",
-    tts_voice_id="",
+    tts_voice_id="1t1EeRixsJrKbiF1zwM6",
 )
 for txt in SEED_MEMORIES["combined"]:
     dunya.add_memory(txt)

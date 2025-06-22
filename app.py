@@ -40,7 +40,7 @@ def load_for_mode(agent, mode: str) -> None:
 
 
 def main() -> None:
-    current = AGENTS["yuvraj"]
+    current = AGENTS["mateo"]
     mode = "combined"
     load_for_mode(current, mode)
     print(
