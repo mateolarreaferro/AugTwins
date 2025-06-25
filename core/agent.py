@@ -26,8 +26,8 @@ except ModuleNotFoundError:  # graceful fallback if dependency missing
 
     util = types.SimpleNamespace(cos_sim=lambda a, b: 0.0)
 
-from . import llm_utils
 from . import memory_utils as mu
+from . import utterance_utils
 
 # Mem0 key for remote memory operations
 try:
@@ -214,21 +214,17 @@ class Agent:
     def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
         relevant = "\n".join(self.retrieve_memories(user_msg))
         graph_info = ", ".join(self.graph_context(user_msg))
-        prompt = (
-            f"You are {self.name}. Personality: {self.personality}\n"
-            "Respond naturally and weave in any relevant memories.\n\n"
-            f"Relevant memories:\n{relevant}\n"
-            f"Graph context: {graph_info}\n\n"
-            f"User: {user_msg}\n{self.name}:"
+        response = utterance_utils.generate_utterance(
+            agent_name=self.name,
+            personality=self.personality,
+            user_msg=user_msg,
+            relevant=relevant,
+            graph_info=graph_info,
+            model=model,
+            temperature=0.5,
         )
-        answer = llm_utils.chat([{"role": "system", "content": prompt}], model=model)
-        # The model sometimes echoes the "Name:" prefix; strip it if present
-        cleaned = answer.lstrip()
-        prefix = f"{self.name}:"
-        if cleaned.lower().startswith(prefix.lower()):
-            cleaned = cleaned[len(prefix):].lstrip()
-        self.add_memory(f"User: {user_msg}\n{self.name}: {cleaned}")
-        return cleaned
+        self.add_memory(f"User: {user_msg}\n{self.name}: {response}")
+        return response
 
        # Speech synthesis (delegates to tts_utils)
     def speak(self, text: str, playback_cmd: str = "afplay") -> None:
