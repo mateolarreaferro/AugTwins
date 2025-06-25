@@ -56,7 +56,10 @@ def save_memories(agent: "Agent", mode: str = "combined") -> None:  # quotes avo
             r = requests.post(_remote_url(agent.name, mode), json=data, headers=headers, timeout=30)
             r.raise_for_status()
         except Exception as e:
-            print("[Mem0 save error]", e)
+            if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
+                print("[Mem0 save error] remote agent or mode not found; using local file")
+            else:
+                print("[Mem0 save error]", e)
             with _path(agent.name, mode).open("w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
     else:
@@ -78,7 +81,10 @@ def load_memories(name: str, mode: str = "combined") -> List["Memory"]:
             r.raise_for_status()
             data = r.json()
         except Exception as e:
-            print("[Mem0 load error]", e)
+            if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
+                print("[Mem0 load error] remote memories not found; falling back to local")
+            else:
+                print("[Mem0 load error]", e)
     if not data:
         p = _path(name, mode)
         if p.exists():
