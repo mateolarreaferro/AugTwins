@@ -219,8 +219,13 @@ class Agent:
             f"User: {user_msg}\n{self.name}:"
         )
         answer = llm_utils.chat([{"role": "system", "content": prompt}], model=model)
-        self.add_memory(f"User: {user_msg}\n{self.name}: {answer}")
-        return answer
+        # The model sometimes echoes the "Name:" prefix; strip it if present
+        cleaned = answer.lstrip()
+        prefix = f"{self.name}:"
+        if cleaned.lower().startswith(prefix.lower()):
+            cleaned = cleaned[len(prefix):].lstrip()
+        self.add_memory(f"User: {user_msg}\n{self.name}: {cleaned}")
+        return cleaned
 
        # Speech synthesis (delegates to tts_utils)
     def speak(self, text: str, playback_cmd: str = "afplay") -> None:
