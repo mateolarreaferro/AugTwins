@@ -28,6 +28,9 @@ try:
 except (ModuleNotFoundError, ImportError):
     _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
 
+if _MEM0_KEY and requests is None:
+    print("[Mem0 disabled] install 'requests' to enable remote persistence")
+
 _BASE_URL = "https://api.mem0.ai/v1"
 
 # storage path
