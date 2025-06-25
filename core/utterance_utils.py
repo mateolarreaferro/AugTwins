@@ -1,4 +1,7 @@
-"""Utilities for crafting agent utterances with transcript-based style cues."""
+"""Utilities for crafting agent utterances with transcript-based style cues.
+
+The transcript snippets describe how an agent speaks—not their favorite topics
+or catchphrases. They guide delivery, phrasing, and rhythm only."""
 from __future__ import annotations
 
 from pathlib import Path
