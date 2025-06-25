@@ -1,6 +1,8 @@
 """Terminal chat launcher for AugTwins."""
 from typing import Dict
 
+from core import seed_db
+
 # Agents
 from seeds.yuvraj import yuvraj, SEED_MEMORIES as YUVRAJ_MEM
 from seeds.dunya import dunya, SEED_MEMORIES as DUNYA_MEM
@@ -34,12 +36,17 @@ def load_for_mode(agent, mode: str) -> None:
     mems = load_memories(agent.name, mode=mode)
     if mems:
         agent.memory = mems
+        agent.rebuild_graph()
     else:
-        for txt in SEEDS[agent.name.lower()].get(mode, []):
+        seeds = seed_db.load_seed_memories(agent.name, mode=mode)
+        if not seeds:
+            seeds = SEEDS.get(agent.name.lower(), {}).get(mode, [])
+        for txt in seeds:
             agent.add_memory(txt)
 
 
 def main() -> None:
+    seed_db.init_db()
     current = AGENTS["mateo"]
     mode = "combined"
     load_for_mode(current, mode)
