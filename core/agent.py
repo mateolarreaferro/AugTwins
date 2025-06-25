@@ -185,7 +185,10 @@ class Agent:
                 r.raise_for_status()
                 results = r.json().get("results", [])
             except Exception as e:
-                print("[Mem0 search error]", e)
+                if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
+                    print("[Mem0 search error] remote search not found; using local memories")
+                else:
+                    print("[Mem0 search error]", e)
 
         local_results: List[str] = []
         if self.memory:
