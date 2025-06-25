@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import os
 import time
-from uuid import uuid4
 from dataclasses import dataclass, field
-from typing import List, Sequence
+from typing import Dict, List, Sequence, Set
 
 try:
     import requests
@@ -27,8 +26,7 @@ except ModuleNotFoundError:  # graceful fallback if dependency missing
 
     util = types.SimpleNamespace(cos_sim=lambda a, b: 0.0)
 
-from . import llm_utils  
-from . import tts_utils
+from . import llm_utils
 from . import memory_utils as mu
 
 # Mem0 key for remote memory operations
@@ -65,6 +63,7 @@ class Agent:
     personality: str
     tts_voice_id: str
     memory: List[Memory] = field(default_factory=list)
+    graph: Dict[str, Set[str]] = field(default_factory=dict)
     _sync_every: int = 5
     _unsynced_count: int = 0
 
@@ -84,7 +83,7 @@ class Agent:
             self.memory = self.memory[-limit:]
             self.sync_memories()
 
-    # ── Embedding helpers 
+    # ── Embedding helpers
     def _ensure_embeddings(self, mems: Sequence[Memory]) -> None:
         missing = [m for m in mems if not m.embedding]
         if missing:
@@ -94,6 +93,41 @@ class Agent:
                     m.embedding = v.tolist()
                 else:
                     m.embedding = list(v)
+
+    # ── Graph helpers
+    def _update_graph(self, text: str) -> None:
+        """Parse simple 'A -> B' or 'A is B' patterns into graph edges."""
+        if "->" in text:
+            a, b = [p.strip().lower() for p in text.split("->", 1)]
+            if a and b:
+                self.graph.setdefault(a, set()).add(b)
+        elif " is " in text:
+            a, b = [p.strip().lower() for p in text.split(" is ", 1)]
+            if a and b:
+                self.graph.setdefault(a, set()).add(b)
+
+    def rebuild_graph(self) -> None:
+        """Recreate graph edges from stored memories."""
+        self.graph.clear()
+        for m in self.memory:
+            self._update_graph(m.text)
+
+    def graph_context(self, query: str, depth: int = 1) -> List[str]:
+        """Return nodes related to tokens in *query* within *depth* hops."""
+        found: Set[str] = set()
+        tokens = {t.lower() for t in query.split()}
+        seeds = [t for t in tokens if t in self.graph]
+        for seed in seeds:
+            to_visit = {seed}
+            for _ in range(depth):
+                next_visit: Set[str] = set()
+                for node in to_visit:
+                    for nb in self.graph.get(node, set()):
+                        if nb not in found:
+                            found.add(nb)
+                            next_visit.add(nb)
+                to_visit = next_visit
+        return list(found)
 
     # Memory CRUD & roll-up
     _MAX_RAW = 200
@@ -112,6 +146,7 @@ class Agent:
             is_summary=is_summary,
         )
         self.memory.append(mem)
+        self._update_graph(text)
         self._maybe_sync()
         if _MEM0_KEY and requests:
             headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
@@ -172,10 +207,12 @@ class Agent:
     # LLM response
     def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
         relevant = "\n".join(self.retrieve_memories(user_msg))
+        graph_info = ", ".join(self.graph_context(user_msg))
         prompt = (
             f"You are {self.name}. Personality: {self.personality}\n"
             "Respond naturally and weave in any relevant memories.\n\n"
-            f"Relevant memories:\n{relevant}\n\n"
+            f"Relevant memories:\n{relevant}\n"
+            f"Graph context: {graph_info}\n\n"
             f"User: {user_msg}\n{self.name}:"
         )
         answer = llm_utils.chat([{"role": "system", "content": prompt}], model=model)
