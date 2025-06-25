@@ -35,6 +35,9 @@ try:
 except (ModuleNotFoundError, ImportError):
     _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
 
+if _MEM0_KEY and requests is None:
+    print("[Mem0 disabled] install 'requests' to enable remote features")
+
 
 # ElevenLabs key (settings.py → env fallback)
 try:
