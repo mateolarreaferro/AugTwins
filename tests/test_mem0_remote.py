@@ -4,32 +4,23 @@ import types
 
 
 def test_remote_save_and_load(tmp_path, monkeypatch):
-    """memory_utils should use the Mem0 API when the key and requests are present."""
-    calls = {"post": [], "get": []}
+    """memory_utils should use the Mem0 client when the key is present."""
+    calls = {"add": [], "list": []}
 
-    class DummyResponse:
-        def __init__(self, data=None):
-            self.status_code = 200
-            self._data = data or []
+    class DummyClient:
+        def add_memory(self, agent: str, **data):
+            calls["add"].append((agent, data))
 
-        def raise_for_status(self):
-            pass
+        def get_all_memories(self, agent: str):
+            calls["list"].append(agent)
+            return [{"text": "hello", "timestamp": 0.0, "embedding": [0, 0, 0], "is_summary": False}]
 
-        def json(self):
-            return self._data
-
-    def post(url, json=None, headers=None, timeout=30):
-        calls["post"].append({"url": url, "json": json, "headers": headers})
-        return DummyResponse()
-
-    def get(url, headers=None, timeout=30):
-        calls["get"].append({"url": url, "headers": headers})
-        data = [{"text": "hello", "timestamp": 0.0, "embedding": [0, 0, 0], "is_summary": False}]
-        return DummyResponse(data)
+    from core import mem0_backend as mb
+    monkeypatch.setattr(mb, "_CLIENT", DummyClient(), raising=False)
+    monkeypatch.setattr(mb, "_API_KEY", "dummy", raising=False)
+    monkeypatch.setattr(mb, "init_client", lambda: mb._CLIENT)
 
     from core import memory_utils as mu
-    dummy_requests = types.SimpleNamespace(post=post, get=get)
-    monkeypatch.setattr(mu, "requests", dummy_requests)
     monkeypatch.setattr(mu, "_MEM0_KEY", "dummy", raising=False)
 
     dummy_st = types.ModuleType("sentence_transformers")
@@ -60,10 +51,8 @@ def test_remote_save_and_load(tmp_path, monkeypatch):
     agent.memory.append(mem)
 
     mu.save_memories(agent)
-    assert calls["post"]
-    assert calls["post"][0]["url"] == mu._remote_url(agent.name, "combined")
+    assert calls["add"]
 
     loaded = mu.load_memories(agent.name)
-    assert calls["get"]
-    assert calls["get"][0]["url"] == mu._remote_url(agent.name, "combined")
+    assert calls["list"]
     assert loaded and loaded[0].text == "hello"

@@ -6,10 +6,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Sequence, Set
 
-try:
-    import requests
-except ModuleNotFoundError:  # optional for offline tests
-    requests = None
+from . import mem0_backend
 try:
     from sentence_transformers import SentenceTransformer, util
 except ModuleNotFoundError:  # graceful fallback if dependency missing
@@ -35,8 +32,8 @@ try:
 except (ModuleNotFoundError, ImportError):
     _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
 
-if _MEM0_KEY and requests is None:
-    print("[Mem0 disabled] install 'requests' to enable remote features")
+if _MEM0_KEY and mem0_backend.init_client() is None:
+    print("[Mem0 disabled] install 'mem0ai' to enable remote features")
 
 
 # ElevenLabs key (settings.py → env fallback)
@@ -151,18 +148,8 @@ class Agent:
         self.memory.append(mem)
         self._update_graph(text)
         self._maybe_sync()
-        if _MEM0_KEY and requests:
-            headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
-            payload = mem.__dict__ | {"agent": self.name}
-            try:
-                requests.post(
-                    "https://api.mem0.ai/v1/memory",
-                    json=payload,
-                    headers=headers,
-                    timeout=30,
-                )
-            except Exception as e:
-                print("[Mem0 add_memory error]", e)
+        if _MEM0_KEY:
+            mem0_backend.add_memory(self.name, mem.__dict__)
         self._auto_rollup()
 
     def _auto_rollup(self) -> None:
@@ -178,20 +165,12 @@ class Agent:
     # Retrieval
     def retrieve_memories(self, query: str, top_k: int = 5) -> List[str]:
         results: List[str] = []
-        if _MEM0_KEY and requests:
-            headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
-            payload = {"query": query, "k": top_k, "agent": self.name}
+        if _MEM0_KEY:
             try:
-                r = requests.post(
-                    "https://api.mem0.ai/v1/search", json=payload, headers=headers, timeout=30
-                )
-                r.raise_for_status()
-                results = r.json().get("results", [])
-            except Exception as e:
-                if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
-                    print("[Mem0 search error] remote search not found; using local memories")
-                else:
-                    print("[Mem0 search error]", e)
+                remote = mem0_backend.search_memory(self.name, query, top_k)
+                results = [m.get("text", "") for m in remote]
+            except Exception as e:  # pragma: no cover - network errors
+                print("[Mem0 search error]", e)
 
         local_results: List[str] = []
         if self.memory:
