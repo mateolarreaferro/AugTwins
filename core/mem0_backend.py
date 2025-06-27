@@ -1,7 +1,11 @@
 from __future__ import annotations
 
-import os
 from typing import Any, Dict, List, Optional
+
+try:
+    from settings import MEM0_API_KEY as _API_KEY
+except (ModuleNotFoundError, ImportError):
+    _API_KEY = ""
 
 # Attempt to import the official SDK
 try:
@@ -11,7 +15,6 @@ except ModuleNotFoundError:  # pragma: no cover - optional dependency
 
 _CLIENT: Optional[Any] = None
 _MEMORY_STORE: Dict[str, List[Dict[str, Any]]] = {}
-_API_KEY = os.getenv("MEM0_API_KEY", "")
 
 
 def init_client() -> Optional[Any]:

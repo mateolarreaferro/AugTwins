@@ -21,7 +21,7 @@ temperature (0.5) so replies sound more natural and less robotic.
 ## Mem0 integration
 
 The app can optionally sync memories to [Mem0](https://mem0.ai).  To enable this
-feature, set the environment variable `MEM0_API_KEY` to a valid API key.  If the
+feature, add `MEM0_API_KEY` to `settings.py`.  If the
 remote service or agent does not exist, the code falls back to local JSON files
 in the `memories/` directory.  `404` errors during startup are therefore
 harmless and usually mean the remote agent or mode hasn’t been created yet.

@@ -30,7 +30,7 @@ from . import utterance_utils
 try:
     from settings import MEM0_API_KEY as _MEM0_KEY
 except (ModuleNotFoundError, ImportError):
-    _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
+    _MEM0_KEY = ""
 
 if _MEM0_KEY and mem0_backend.init_client() is None:
     print("[Mem0 disabled] install 'mem0ai' to enable remote features")

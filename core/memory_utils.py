@@ -7,7 +7,6 @@ This version avoids circular-import problems by:
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 from typing import List, TYPE_CHECKING
 
@@ -22,7 +21,7 @@ if TYPE_CHECKING:          # <- evaluated by tools like mypy, ignored at runtime
 try:
     from settings import MEM0_API_KEY as _MEM0_KEY
 except (ModuleNotFoundError, ImportError):
-    _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
+    _MEM0_KEY = ""
 
 # storage path
 _DIR = Path("memories")
