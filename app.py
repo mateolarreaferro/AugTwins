@@ -47,7 +47,7 @@ def load_for_mode(agent, mode: str) -> None:
 
 def main() -> None:
     seed_db.init_db()
-    current = AGENTS["mateo"]
+    current = AGENTS["lars"]
     mode = "combined"
     load_for_mode(current, mode)
     print(
