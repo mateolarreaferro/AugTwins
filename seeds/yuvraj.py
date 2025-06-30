@@ -1,20 +1,24 @@
-from core.agent import Agent
+from pathlib import Path
 
-SEED_MEMORIES = {
-    "interview": [
-        "I grew up in both the Bay Area and India.",
-        "I studied Computer Science and Statistics at UC Davis."
-    ],
-    "web": [
-        "Articles mention my interest in using large language models for programming."
-    ]
-}
-SEED_MEMORIES["combined"] = SEED_MEMORIES["interview"] + SEED_MEMORIES["web"]
+from .profile_base import ProfileAgent
 
-yuvraj = Agent(
-    name="Yuvraj",
-    personality="Curious coder from the Bay Area and India who studied CS and Stats at UC Davis.",
-    tts_voice_id="1t1EeRixsJrKbiF1zwM6",
-)
-for txt in SEED_MEMORIES["combined"]:
-    yuvraj.add_memory(txt)
+SEED_MEMORIES = [
+    "I grew up in both the Bay Area and India.",
+    "I studied Computer Science and Statistics at UC Davis.",
+    "Articles mention my interest in using large language models for programming.",
+]
+
+PERSONA_DESCRIPTION = "Curious coder from the Bay Area and India who studied CS and Stats at UC Davis."
+
+
+class Yuvraj(ProfileAgent):
+    transcript_path = Path(__file__).resolve().parents[1] / "transcripts/yuvraj.txt"
+    persona = PERSONA_DESCRIPTION
+
+    def __init__(self) -> None:
+        super().__init__(name="Yuvraj", personality=PERSONA_DESCRIPTION, tts_voice_id="1t1EeRixsJrKbiF1zwM6")
+        for txt in SEED_MEMORIES:
+            self.add_memory(txt)
+
+
+yuvraj = Yuvraj()
