@@ -61,9 +61,9 @@ def test_remote_save_and_load(tmp_path, monkeypatch):
 
     mu.save_memories(agent)
     assert calls["post"]
-    assert calls["post"][0]["url"] == mu._remote_url(agent.name, "combined")
+    assert calls["post"][0]["url"] == mu._remote_url(agent.name)
 
     loaded = mu.load_memories(agent.name)
     assert calls["get"]
-    assert calls["get"][0]["url"] == mu._remote_url(agent.name, "combined")
+    assert calls["get"][0]["url"] == mu._remote_url(agent.name)
     assert loaded and loaded[0].text == "hello"

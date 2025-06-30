@@ -15,7 +15,6 @@ def init_db(path: Union[str, Path] = DB_PATH) -> None:
             """CREATE TABLE IF NOT EXISTS seeds (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 agent TEXT NOT NULL,
-                mode TEXT NOT NULL,
                 text TEXT NOT NULL
             )"""
         )
@@ -23,36 +22,29 @@ def init_db(path: Union[str, Path] = DB_PATH) -> None:
         cur.execute("SELECT COUNT(*) FROM seeds")
         if cur.fetchone()[0] == 0:
             sample = [
-                ("mateo", "interview", "I study HCI at Stanford."),
-                ("mateo", "web", "I enjoy Radiohead."),
-                ("dünya", "interview", "I was born in Turkey."),
-                ("dünya", "web", "I like to dance."),
+                ("mateo", "I study HCI at Stanford."),
+                ("mateo", "I enjoy Radiohead."),
+                ("dünya", "I was born in Turkey."),
+                ("dünya", "I like to dance."),
             ]
             cur.executemany(
-                "INSERT INTO seeds(agent, mode, text) VALUES(?, ?, ?)", sample
+                "INSERT INTO seeds(agent, text) VALUES(?, ?)", sample
             )
             conn.commit()
 
 
 def load_seed_memories(
     agent: str,
-    mode: str = "combined",
     *,
     path: Union[str, Path] = DB_PATH,
 ) -> List[str]:
-    """Return seed memory texts for *agent* and *mode* from the database."""
+    """Return seed memory texts for *agent* from the database."""
     path = Path(path)
     if not path.exists():
         return []
     agent = agent.lower()
     with sqlite3.connect(path) as conn:
         cur = conn.cursor()
-        if mode == "combined":
-            cur.execute("SELECT text FROM seeds WHERE agent=? ORDER BY id", (agent,))
-        else:
-            cur.execute(
-                "SELECT text FROM seeds WHERE agent=? AND mode=? ORDER BY id",
-                (agent, mode),
-            )
+        cur.execute("SELECT text FROM seeds WHERE agent=? ORDER BY id", (agent,))
         rows = cur.fetchall()
     return [r[0] for r in rows]

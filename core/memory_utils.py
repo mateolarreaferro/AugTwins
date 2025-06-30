@@ -42,35 +42,37 @@ def _use_remote() -> bool:
     return bool(_MEM0_KEY and requests)
 
 
-def _path(name: str, mode: str = "combined") -> Path:
-    return _DIR / f"{name.lower()}_{mode}_memories.json"
+def _path(name: str) -> Path:
+    """Return the local JSON file path for *name*'s memories."""
+    return _DIR / f"{name.lower()}_memories.json"
 
 
-def _remote_url(name: str, mode: str) -> str:
-    return f"{_BASE_URL}/agents/{name.lower()}/memories/{mode}"
+def _remote_url(name: str) -> str:
+    """Return the Mem0 API URL for *name*'s memories."""
+    return f"{_BASE_URL}/agents/{name.lower()}/memories"
 
 
 # save / load
-def save_memories(agent: "Agent", mode: str = "combined") -> None:  # quotes avoid runtime eval
+def save_memories(agent: "Agent") -> None:  # quotes avoid runtime eval
     data = [m.__dict__ for m in agent.memory]
     if _use_remote():
         headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
         try:
-            r = requests.post(_remote_url(agent.name, mode), json=data, headers=headers, timeout=30)
+            r = requests.post(_remote_url(agent.name), json=data, headers=headers, timeout=30)
             r.raise_for_status()
         except Exception as e:
             if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
-                print("[Mem0 save error] remote agent or mode not found; using local file")
+                print("[Mem0 save error] remote agent not found; using local file")
             else:
                 print("[Mem0 save error]", e)
-            with _path(agent.name, mode).open("w", encoding="utf-8") as f:
+            with _path(agent.name).open("w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
     else:
-        with _path(agent.name, mode).open("w", encoding="utf-8") as f:
+        with _path(agent.name).open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def load_memories(name: str, mode: str = "combined") -> List["Memory"]:
+def load_memories(name: str) -> List["Memory"]:
     """
     Lazy-import Memory *inside* the function to avoid circular imports.
     Called only after core.agent has finished initialising.
@@ -80,7 +82,7 @@ def load_memories(name: str, mode: str = "combined") -> List["Memory"]:
     if _use_remote():
         headers = {"Authorization": f"Bearer {_MEM0_KEY}"}
         try:
-            r = requests.get(_remote_url(name, mode), headers=headers, timeout=30)
+            r = requests.get(_remote_url(name), headers=headers, timeout=30)
             r.raise_for_status()
             data = r.json()
         except Exception as e:
@@ -89,7 +91,7 @@ def load_memories(name: str, mode: str = "combined") -> List["Memory"]:
             else:
                 print("[Mem0 load error]", e)
     if not data:
-        p = _path(name, mode)
+        p = _path(name)
         if p.exists():
             with p.open("r", encoding="utf-8") as f:
                 data = json.load(f)

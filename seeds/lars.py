@@ -1,20 +1,24 @@
-from core.agent import Agent
+from pathlib import Path
 
-SEED_MEMORIES = {
-    "interview": [
-        "I'm from Germany and Virginia and study immersive experiences at SCAD.",
-        "My girlfriend is Anushhka and we have a dragon pet named Sara."
-    ],
-    "web": [
-        "I love music from the '60s and '70s."
-    ]
-}
-SEED_MEMORIES["combined"] = SEED_MEMORIES["interview"] + SEED_MEMORIES["web"]
+from .profile_base import ProfileAgent
 
-lars = Agent(
-    name="Lars",
-    personality="Immersive experiences student who loves classic music.",
-    tts_voice_id="5epn2vbuws8S5MRzxJH8",
-)
-for txt in SEED_MEMORIES["combined"]:
-    lars.add_memory(txt)
+SEED_MEMORIES = [
+    "I'm from Germany and Virginia and study immersive experiences at SCAD.",
+    "My girlfriend is Anushhka and we have a dragon pet named Sara.",
+    "I love music from the '60s and '70s.",
+]
+
+PERSONA_DESCRIPTION = "Immersive experiences student who loves classic music."
+
+
+class Lars(ProfileAgent):
+    transcript_path = Path(__file__).resolve().parents[1] / "transcripts/lars.txt"
+    persona = PERSONA_DESCRIPTION
+
+    def __init__(self) -> None:
+        super().__init__(name="Lars", personality=PERSONA_DESCRIPTION, tts_voice_id="5epn2vbuws8S5MRzxJH8")
+        for txt in SEED_MEMORIES:
+            self.add_memory(txt)
+
+
+lars = Lars()
