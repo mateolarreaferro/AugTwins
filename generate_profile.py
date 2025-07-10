@@ -218,7 +218,11 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     project_root = Path(__file__).resolve().parent.parent  # hop out of interviews/
     transcripts_dir = project_root / "interviews" / args.person / "transcripts"
     if not transcripts_dir.exists():
-        logging.critical("Transcripts directory not found: %s", transcripts_dir)
+        logging.critical(
+            "Transcripts directory not found: %s. Run transcribe.py first or "
+            "place your .txt files there.",
+            transcripts_dir,
+        )
         sys.exit(1)
 
     txt_files = sorted(transcripts_dir.glob("*.txt"))
@@ -275,6 +279,7 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     logging.info("Persona written → %s", persona_path)
 
     utter_path = project_root / "transcripts" / f"{args.person.lower()}.json"
+    utter_path.parent.mkdir(parents=True, exist_ok=True)
     utter_path.write_text(json.dumps(utterance, indent=2, ensure_ascii=False))
     logging.info("Utterance guide written → %s", utter_path)
 
