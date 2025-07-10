@@ -28,6 +28,13 @@ except ImportError:  # pragma: no cover
 import tiktoken  # type: ignore
 from openai import OpenAI, OpenAIError, RateLimitError  # type: ignore
 
+# Optional mem0 dependency
+try:
+    from mem0 import Memory  # type: ignore
+    MEM0_AVAILABLE = True
+except ImportError:
+    MEM0_AVAILABLE = False
+
 
 DEFAULT_MODEL = "gpt-4o-mini"
 MAX_MODEL_TOKENS = 8_192  # soft cap we respect regardless of model
@@ -46,10 +53,11 @@ MEMORY_PROMPT_SYSTEM = (
 
 PERSONA_PROMPT = (
     "You are an expert biographer. Based on the complete interview transcripts, "
-    "write a persona description in FIRST PERSON (using 'I', 'my', 'me') as if the speaker is describing themselves, and infer their overall personality type. "
+    "create a comprehensive persona profile in FIRST PERSON (using 'I', 'my', 'me') as if the speaker is describing themselves. "
+    "Include: name, age, occupation/student status, key personality traits, main interests/hobbies, goals/motivations, and personality type (like MBTI). "
     "Return ONLY a valid JSON object. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
     "Use this exact schema: "
-    "{\"description\": <string>, \"personality_type\": <string>}"
+    "{\"name\": <string>, \"age\": <number>, \"occupation\": <string>, \"personality_traits\": [<string>, ...], \"interests\": [<string>, ...], \"goals_motivations\": [<string>, ...], \"personality_type\": <string>, \"description\": <string>}"
 )
 
 UTTERANCE_PROMPT = (
@@ -203,12 +211,97 @@ def build_openai_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
+def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utterance: Dict[str, Any], user_id: str) -> bool:
+    """Upload agent profile data to Mem0 memory system."""
+    if not MEM0_AVAILABLE:
+        logging.warning("Mem0 not available - skipping memory upload. Install with: pip install mem0ai")
+        return False
+    
+    try:
+        # Get Mem0 API key
+        mem0_api_key = os.getenv("MEM0_API_KEY")
+        if not mem0_api_key:
+            try:
+                from settings import MEM0_API_KEY
+                mem0_api_key = MEM0_API_KEY
+            except ImportError:
+                logging.warning("MEM0_API_KEY not found - skipping memory upload")
+                return False
+        
+        # Initialize Mem0 client
+        os.environ["MEM0_API_KEY"] = mem0_api_key
+        m = Memory()
+        
+        # Upload memories
+        for memory in memories:
+            memory_text = memory.get("memory", "")
+            memory_type = memory.get("type", "general")
+            tags = memory.get("tags", [])
+            
+            if memory_text:
+                # Create a conversational message format for Mem0
+                messages = [
+                    {"role": "user", "content": f"Remember this about me: {memory_text}"},
+                    {"role": "assistant", "content": f"I'll remember that {memory_text}"}
+                ]
+                
+                metadata = {
+                    "type": memory_type,
+                    "tags": tags,
+                    "source": "profile_generation"
+                }
+                
+                result = m.add(messages, user_id=user_id, metadata=metadata)
+                logging.debug(f"Added memory to Mem0: {memory_text[:50]}...")
+        
+        # Upload persona information
+        if persona.get("description"):
+            persona_messages = [
+                {"role": "user", "content": f"This is my personality profile: {persona['description']}"},
+                {"role": "assistant", "content": f"I understand your personality profile. You are {persona.get('personality_type', 'unique')}."}
+            ]
+            
+            persona_metadata = {
+                "type": "persona",
+                "personality_type": persona.get("personality_type", ""),
+                "source": "profile_generation"
+            }
+            
+            m.add(persona_messages, user_id=user_id, metadata=persona_metadata)
+            logging.info("Uploaded persona to Mem0")
+        
+        # Upload utterance style guide
+        if utterance.get("style_guide"):
+            style_messages = [
+                {"role": "user", "content": f"This is how I speak and communicate: {utterance['style_guide']}"},
+                {"role": "assistant", "content": "I'll remember your communication style and speech patterns."}
+            ]
+            
+            style_metadata = {
+                "type": "communication_style",
+                "sample_phrases": utterance.get("sample_phrases", []),
+                "source": "profile_generation"
+            }
+            
+            m.add(style_messages, user_id=user_id, metadata=style_metadata)
+            logging.info("Uploaded communication style to Mem0")
+        
+        logging.info(f"Successfully uploaded profile to Mem0 for user: {user_id}")
+        return True
+        
+    except Exception as e:
+        logging.error(f"Failed to upload to Mem0: {e}")
+        return False
+
+
 def parse_args(argv: List[str] | None = None) -> argparse.Namespace:  # pragma: no cover
     parser = argparse.ArgumentParser(description="Generate a Mem0‑ready profile JSON from transcripts.")
     parser.add_argument("person", help="Subfolder name under interviews/<person>/transcripts")
     parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI chat model, default: %(default)s")
     parser.add_argument("--max-tokens", type=int, default=DEFAULT_CHUNK_TOKENS, help="Token budget per transcript chunk")
     parser.add_argument("--verbose", "-v", action="count", default=0, help="Increase log verbosity (-v or -vv)")
+    parser.add_argument("--upload-mem0", action="store_true", help="Upload generated profile to Mem0 memory system")
+    parser.add_argument("--mem0-user-id", help="User ID for Mem0 upload (defaults to person name)")
     return parser.parse_args(argv)
 
 
@@ -289,6 +382,16 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     utter_path = agent_dir / "utterance.json"
     utter_path.write_text(json.dumps(utterance, indent=2, ensure_ascii=False))
     logging.info("Utterance guide written → %s", utter_path)
+
+    # Upload to Mem0 if requested
+    if args.upload_mem0:
+        user_id = args.mem0_user_id or args.person.lower()
+        logging.info(f"Uploading profile to Mem0 for user: {user_id}")
+        success = upload_to_mem0(memories, persona, utterance, user_id)
+        if success:
+            logging.info("✅ Profile successfully uploaded to Mem0")
+        else:
+            logging.warning("❌ Failed to upload profile to Mem0")
 
 
 if __name__ == "__main__":

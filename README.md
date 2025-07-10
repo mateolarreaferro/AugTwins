@@ -27,3 +27,19 @@ from the project root. This will create three artefacts:
    agent profile (see `agents/Lars/lars.py`). The `agents/` directory is created
    automatically if it does not exist.
 
+## Mem0 Integration
+
+To upload the generated profile to Mem0 memory system, use the `--upload-mem0` flag:
+
+```bash
+python generate_profile.py lars --upload-mem0
+```
+
+Optional arguments:
+- `--mem0-user-id <id>`: Specify a custom user ID for Mem0 (defaults to person name)
+- `--verbose`: Enable verbose logging to see upload progress
+
+Requirements:
+- Mem0 API key in `settings.py` or environment variable `MEM0_API_KEY`
+- Install mem0ai: `pip install mem0ai` (already in requirements.txt)
+
