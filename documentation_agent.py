@@ -24,7 +24,7 @@ SOURCE_FILES = [
     "core/llm_utils.py",
     "core/agent.py",
     "core/memory_utils.py",
-    "seeds/lars.py",
+    "agents/Lars/lars.py",
 ]
 
 

@@ -1,47 +1,3 @@
-#!/usr/bin/env python3
-"""
-Generate structured memories, a detailed persona description, and an utterance style guide
-from a speaker's interview transcripts.
-
-The script walks the directory tree that looks like this (example):
-
-AugTwins/
-├── interviews/
-│   ├── lars/
-│   │   ├── transcripts/
-│   │   │   ├── interview1.mp3.txt
-│   │   │   └── interview2.wav.txt
-│   │   └── ...
-└── interviews/generate_profile.py  <‑‑ this file
-
-Run from the project root:
-
-    python interviews/generate_profile.py lars
-
-Output:
-    AugTwins/interviews/lars/profile.json
-
-Main improvements compared with the earlier version
----------------------------------------------------
-* **Security**
-  * The OpenAI key *must* come from the environment or a `.env` file – no more  hard‑coding.
-  * Removes silent fallback behaviour that could accidentally leak keys.
-* **Reliability & Efficiency**
-  * Robust exponential‑back‑off retry wrapper for *all* OpenAI calls (network, rate‑limit).
-  * Token‑aware text chunker prevents overrunning the model context size.
-  * Deduplication logic normalises whitespace & case.
-  * Only the minimal text needed for persona/utterance prompts is sent (respecting token limit).
-* **Usability**
-  * CLI with `argparse` (adds `--model`, `--max‑tokens`, `--verbose`).
-  * Structured logging instead of bare `print`.
-  * Optional progress bars when `tqdm` is available.
-
-Dependencies
-------------
-```
-pip install --upgrade openai tiktoken tenacity python‑dotenv tqdm
-```
-"""
 from __future__ import annotations
 
 import argparse
@@ -82,23 +38,67 @@ SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 # System prompts
 MEMORY_PROMPT_SYSTEM = (
     "You are a knowledge engineer. Extract atomic factual memories about the speaker. "
-    "Each memory must be a single declarative sentence about a stable fact, preference, skill, event, or belief. "
-    "Return ONLY valid JSON in the following schema: "
+    "Each memory must be a single declarative sentence in FIRST PERSON (using 'I', 'my', 'me') about a stable fact, preference, skill, event, or belief. "
+    "Return ONLY a valid JSON array. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
+    "Use this exact schema: "
     "[{\"memory\": <string>, \"type\": <'biographical'|'preference'|'skill'|'belief'|'event'>, \"tags\": [<string>, ...]}]"
 )
 
 PERSONA_PROMPT = (
     "You are an expert biographer. Based on the complete interview transcripts, "
-    "summarize the speaker and infer their overall personality type. "
-    "Return ONLY valid JSON in the form: "
+    "write a persona description in FIRST PERSON (using 'I', 'my', 'me') as if the speaker is describing themselves, and infer their overall personality type. "
+    "Return ONLY a valid JSON object. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
+    "Use this exact schema: "
     "{\"description\": <string>, \"personality_type\": <string>}"
 )
 
 UTTERANCE_PROMPT = (
-    "Analyze the speaker's dialogue to build an utterance guide that another AI can use to mimic their speech patterns. "
-    "Include:\n- overall style summary (tone, vocabulary, formality)\n- common phrases or exclamations (5‑10)\n- guidance on prosody/pacing\n- filler words or quirks\nReturn this guide as valid JSON: "
+    "Analyze the speaker's dialogue to build an utterance guide in FIRST PERSON (using 'I', 'my', 'me') that another AI can use to mimic their speech patterns. "
+    "Include:\n- overall style summary (my tone, vocabulary, formality)\n- common phrases or exclamations I use (5‑10)\n- guidance on my prosody/pacing\n- my filler words or quirks\n"
+    "Return ONLY a valid JSON object. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
+    "Use this exact schema: "
     "{\"style_guide\": <string>, \"sample_phrases\": [<string>, ...]}"
 )
+
+
+def clean_json_response(raw_response: str) -> str:
+    """Clean up JSON response by removing markdown code blocks and extra text."""
+    # Remove markdown code blocks
+    if "```json" in raw_response:
+        start = raw_response.find("```json") + 7
+        end = raw_response.find("```", start)
+        if end != -1:
+            raw_response = raw_response[start:end].strip()
+    elif "```" in raw_response:
+        start = raw_response.find("```") + 3
+        end = raw_response.find("```", start)
+        if end != -1:
+            raw_response = raw_response[start:end].strip()
+    
+    # Find JSON by looking for { or [ at start
+    raw_response = raw_response.strip()
+    if raw_response.startswith('{') or raw_response.startswith('['):
+        # Find the matching closing brace/bracket
+        if raw_response.startswith('{'):
+            brace_count = 0
+            for i, char in enumerate(raw_response):
+                if char == '{':
+                    brace_count += 1
+                elif char == '}':
+                    brace_count -= 1
+                    if brace_count == 0:
+                        return raw_response[:i+1]
+        elif raw_response.startswith('['):
+            bracket_count = 0
+            for i, char in enumerate(raw_response):
+                if char == '[':
+                    bracket_count += 1
+                elif char == ']':
+                    bracket_count -= 1
+                    if bracket_count == 0:
+                        return raw_response[:i+1]
+    
+    return raw_response
 
 
 def count_tokens(text: str) -> int:
@@ -161,7 +161,8 @@ def extract_memories(client: OpenAI, model: str, transcript: str, chunk_tokens: 
             ],
         )
         try:
-            batch = json.loads(raw)
+            cleaned_raw = clean_json_response(raw)
+            batch = json.loads(cleaned_raw)
             if isinstance(batch, list):
                 all_memories.extend(batch)
             else:
@@ -193,8 +194,12 @@ def trim_to_token_limit(text: str, max_tokens: int) -> str:
 def build_openai_client() -> OpenAI:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        logging.critical("OPENAI_API_KEY not set (env or .env)")
-        sys.exit(1)
+        try:
+            from settings import OPENAI_API_KEY
+            api_key = OPENAI_API_KEY
+        except ImportError:
+            logging.critical("OPENAI_API_KEY not set (env or .env) and settings.py not found")
+            sys.exit(1)
     return OpenAI(api_key=api_key)
 
 
@@ -202,7 +207,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:  # pragma: 
     parser = argparse.ArgumentParser(description="Generate a Mem0‑ready profile JSON from transcripts.")
     parser.add_argument("person", help="Subfolder name under interviews/<person>/transcripts")
     parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI chat model, default: %(default)s")
-    parser.add_argument("--max‑tokens", type=int, default=DEFAULT_CHUNK_TOKENS, help="Token budget per transcript chunk")
+    parser.add_argument("--max-tokens", type=int, default=DEFAULT_CHUNK_TOKENS, help="Token budget per transcript chunk")
     parser.add_argument("--verbose", "-v", action="count", default=0, help="Increase log verbosity (-v or -vv)")
     return parser.parse_args(argv)
 
@@ -215,7 +220,7 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         format="%(levelname)s | %(message)s",
     )
 
-    project_root = Path(__file__).resolve().parent.parent  # hop out of interviews/
+    project_root = Path(__file__).resolve().parent  # current directory is project root
     transcripts_dir = project_root / "interviews" / args.person / "transcripts"
     if not transcripts_dir.exists():
         logging.critical(
@@ -247,7 +252,8 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         ],
     )
     try:
-        persona = json.loads(persona_raw)
+        cleaned_persona_raw = clean_json_response(persona_raw)
+        persona = json.loads(cleaned_persona_raw)
     except json.JSONDecodeError:
         logging.warning("Persona JSON malformed – storing raw text as 'description'.")
         persona = {"description": persona_raw.strip(), "personality_type": ""}
@@ -262,24 +268,25 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         ],
     )
     try:
-        utterance = json.loads(utterance_raw)
+        cleaned_utterance_raw = clean_json_response(utterance_raw)
+        utterance = json.loads(cleaned_utterance_raw)
     except json.JSONDecodeError:
         logging.warning("Utterance JSON malformed – embedding raw text as 'style_guide'.")
         utterance = {"style_guide": utterance_raw.strip(), "sample_phrases": []}
 
-    # ── Write separate artefacts
-    base_dir = transcripts_dir.parent
+    # ── Write separate artefacts to agents folder
+    agent_dir = project_root / "agents" / args.person.title()
+    agent_dir.mkdir(parents=True, exist_ok=True)
 
-    mem_path = base_dir / "memories.json"
+    mem_path = agent_dir / "memories.json"
     mem_path.write_text(json.dumps(memories, indent=2, ensure_ascii=False))
     logging.info("Memories written → %s", mem_path)
 
-    persona_path = base_dir / "persona.json"
+    persona_path = agent_dir / "persona.json"
     persona_path.write_text(json.dumps(persona, indent=2, ensure_ascii=False))
     logging.info("Persona written → %s", persona_path)
 
-    utter_path = project_root / "transcripts" / f"{args.person.lower()}.json"
-    utter_path.parent.mkdir(parents=True, exist_ok=True)
+    utter_path = agent_dir / "utterance.json"
     utter_path.write_text(json.dumps(utterance, indent=2, ensure_ascii=False))
     logging.info("Utterance guide written → %s", utter_path)
 

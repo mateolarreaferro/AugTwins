@@ -4,7 +4,7 @@ from typing import Dict
 from core import seed_db
 
 # Agents
-from seeds.lars import lars, SEED_MEMORIES as LARS_MEM
+from agents.Lars.lars import lars, SEED_MEMORIES as LARS_MEM
 
 from core.memory_utils import load_memories, save_memories, summarize_recent
 
