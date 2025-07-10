@@ -55,7 +55,7 @@ from typing import Any, Dict, List
 
 from tenacity import retry, stop_after_attempt, wait_exponential  # type: ignore
 
-# Optional (soft) deps ---------------------------------------------------------
+# Optional (soft) deps 
 try:
     from dotenv import load_dotenv  # type: ignore
 
@@ -68,18 +68,18 @@ try:
 except ImportError:  # pragma: no cover
     tqdm = None  # type: ignore
 
-# third‑party hard deps --------------------------------------------------------
+# third‑party hard deps 
 import tiktoken  # type: ignore
 from openai import OpenAI, OpenAIError, RateLimitError  # type: ignore
 
-# ----------------------------------------------------------------------------
+
 DEFAULT_MODEL = "gpt-4o-mini"
 MAX_MODEL_TOKENS = 8_192  # soft cap we respect regardless of model
 DEFAULT_CHUNK_TOKENS = 6_000  # leave headroom for instructions & response
 ENCODING = tiktoken.encoding_for_model(DEFAULT_MODEL)
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 
-# System prompts -------------------------------------------------------------
+# System prompts
 MEMORY_PROMPT_SYSTEM = (
     "You are a knowledge engineer. Extract atomic factual memories about the speaker. "
     "Each memory must be a single declarative sentence about a stable fact, preference, skill, event, or belief. "
@@ -98,7 +98,6 @@ UTTERANCE_PROMPT = (
     "{\"style_guide\": <string>, \"sample_phrases\": [<string>, ...]}"
 )
 
-# ----------------------------------------------------------------------------
 
 def count_tokens(text: str) -> int:
     """Return the approximate token count for `text`."""
@@ -188,7 +187,6 @@ def trim_to_token_limit(text: str, max_tokens: int) -> str:
     return ENCODING.decode(tokens[-max_tokens:])
 
 
-# ----------------------------------------------------------------------------
 
 def build_openai_client() -> OpenAI:
     api_key = os.getenv("OPENAI_API_KEY")
@@ -230,10 +228,10 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
 
     client = build_openai_client()
 
-    # Step 1: Memories -----------------------------------------------------------------
+    # Step 1: Memories
     memories = extract_memories(client, args.model, full_transcript, args.max_tokens)
 
-    # Step 2: Persona description -------------------------------------------------------
+    # Step 2: Persona description 
     persona_text = chat(
         client,
         args.model,
@@ -243,7 +241,7 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         ],
     ).strip()
 
-    # Step 3: Utterance style guide -----------------------------------------------------
+    # Step 3: Utterance style guide 
     utterance_raw = chat(
         client,
         args.model,
@@ -258,7 +256,7 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         logging.warning("Utterance JSON malformed – embedding raw text as 'style_guide'.")
         utterance = {"style_guide": utterance_raw.strip(), "sample_phrases": []}
 
-    # Assemble & write profile ----------------------------------------------------------
+    # Assemble & write profile
     profile: Dict[str, Any] = {
         "name": args.person.capitalize(),
         "persona": persona_text,
