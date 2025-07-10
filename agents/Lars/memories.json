@@ -1,17 +1,10 @@
 [
   {
-    "memory": "I am Lars Langenbach.",
+    "memory": "My name is Lars Langenbach.",
     "type": "biographical",
     "tags": [
+      "identity",
       "name"
-    ]
-  },
-  {
-    "memory": "My birthday is the 28th of July, 2004.",
-    "type": "biographical",
-    "tags": [
-      "birthday",
-      "date_of_birth"
     ]
   },
   {
@@ -22,25 +15,34 @@
     ]
   },
   {
+    "memory": "My birthday is the 28th of July, 2004.",
+    "type": "biographical",
+    "tags": [
+      "birthday"
+    ]
+  },
+  {
     "memory": "I was born in Vienna, Virginia, in Fairfax County.",
     "type": "biographical",
     "tags": [
-      "birthplace"
+      "birthplace",
+      "Virginia"
     ]
   },
   {
     "memory": "I currently live in a hacker house in Cambridge.",
     "type": "biographical",
     "tags": [
-      "current_residence"
+      "current residence",
+      "Cambridge"
     ]
   },
   {
-    "memory": "My cultural and ethnic background is half German, 25% American from Switzerland, and a quarter Japanese.",
+    "memory": "I am half German, 25% American, and a quarter Japanese.",
     "type": "biographical",
     "tags": [
-      "ethnicity",
-      "cultural_background"
+      "ethnic background",
+      "cultural heritage"
     ]
   },
   {
@@ -48,31 +50,36 @@
     "type": "skill",
     "tags": [
       "languages",
-      "fluency"
+      "English",
+      "German",
+      "Hindi",
+      "Spanish"
     ]
   },
   {
-    "memory": "I went to the German International School of Washington, DC, for the first 14 years of my life.",
+    "memory": "I attended the German International School of Washington, DC, for the first 14 years of my life.",
     "type": "biographical",
     "tags": [
       "education",
-      "school"
+      "school",
+      "DC"
     ]
   },
   {
-    "memory": "I moved to Frankfurt, Germany, where I went to the Humboldt-Gymnasium for about a year.",
+    "memory": "I moved to Germany and attended the Humboldt-Gymnasium for about a year.",
     "type": "biographical",
     "tags": [
       "education",
-      "higher_education"
+      "Germany"
     ]
   },
   {
-    "memory": "Then I switched to the Stratdorf International School for the rest of my high school, which was three years.",
+    "memory": "I then switched to the Stratdorf International School for the rest of my high school.",
     "type": "biographical",
     "tags": [
       "education",
-      "high_school"
+      "high school",
+      "Germany"
     ]
   },
   {
@@ -80,133 +87,156 @@
     "type": "biographical",
     "tags": [
       "education",
-      "current_studies"
+      "college",
+      "major"
     ]
   },
   {
-    "memory": "I do not have a current job.",
+    "memory": "My first ever job was as a SCAD intramurals gym assistant.",
     "type": "biographical",
     "tags": [
-      "employment_status"
+      "employment",
+      "first job"
     ]
   },
   {
-    "memory": "My first job was a SCAD intramurals gym assistant, where I scanned people's IDs.",
+    "memory": "I took a break from my job at the SCAD intramurals gym before the summer due to classwork.",
     "type": "event",
     "tags": [
-      "first_job",
-      "employment"
+      "employment",
+      "job break"
     ]
   },
   {
-    "memory": "I would love to start my own company someday.",
+    "memory": "I would love to start my own company in the future.",
     "type": "preference",
     "tags": [
-      "career_aspiration"
+      "career",
+      "entrepreneurship"
     ]
   },
   {
-    "memory": "I do not want to become a corporate slave.",
+    "memory": "I am scared of becoming a corporate slave and being enslaved by money.",
     "type": "belief",
     "tags": [
-      "work_culture"
+      "fear",
+      "work culture"
     ]
   },
   {
-    "memory": "I am going to be the next co-president of the Immersive Reality Club at SCAD.",
-    "type": "event",
-    "tags": [
-      "club_affiliation"
-    ]
-  },
-  {
-    "memory": "I have been the social media manager for the Immersive Reality Club for the past year.",
-    "type": "event",
-    "tags": [
-      "club_affiliation",
-      "social_media"
-    ]
-  },
-  {
-    "memory": "I used to swim and was a part of my neighborhood's swim team.",
+    "memory": "I have been the social media manager for the Immersive Reality Club at SCAD for the past year.",
     "type": "biographical",
     "tags": [
-      "hobbies",
-      "sports"
+      "affiliations",
+      "club",
+      "social media"
     ]
   },
   {
-    "memory": "I grew up in an atheist family.",
-    "type": "biographical",
+    "memory": "I used to swim and was part of a neighborhood swim team during my childhood.",
+    "type": "event",
     "tags": [
-      "religion",
-      "family_background"
+      "sports",
+      "swimming"
     ]
   },
   {
-    "memory": "I started practicing Hinduism and meditating a year ago.",
+    "memory": "I grew up in an atheist family where my mom is a veterinarian and values science over religion.",
+    "type": "belief",
+    "tags": [
+      "family",
+      "religion"
+    ]
+  },
+  {
+    "memory": "I have recently started practicing Hinduism after being introduced to it by Anushka.",
     "type": "belief",
     "tags": [
       "religion",
-      "spirituality"
+      "Hinduism"
     ]
   },
   {
-    "memory": "I dislike arrogant and condescending people.",
+    "memory": "I dislike arrogance and condescending attitudes in people.",
     "type": "preference",
     "tags": [
-      "social_interaction",
-      "traits"
+      "interpersonal relationships",
+      "dislikes"
     ]
   },
   {
-    "memory": "I often internalize my anger.",
+    "memory": "I internalize a lot of my anger but sometimes address it calmly.",
     "type": "belief",
     "tags": [
-      "emotional_expression"
+      "anger management"
     ]
   },
   {
-    "memory": "I am scared of the dark and shady street corners.",
+    "memory": "I am uncomfortable discussing subjects like racism and family politics in public settings.",
     "type": "belief",
     "tags": [
-      "fears"
+      "social discomfort",
+      "topics"
     ]
   },
   {
-    "memory": "I find dry humor amusing.",
+    "memory": "I withdraw in massive social situations where I have nothing to add.",
+    "type": "belief",
+    "tags": [
+      "social behavior",
+      "withdrawal"
+    ]
+  },
+  {
+    "memory": "I find dry humor funny and appreciate absurd jokes that don't require laughter.",
     "type": "preference",
     "tags": [
-      "humor"
+      "humor",
+      "comedy"
     ]
   },
   {
-    "memory": "I resent it when people assume I'm just a nice person without knowing me well.",
+    "memory": "I resented the expectation of people wanting to dig into my personal life.",
     "type": "belief",
     "tags": [
-      "assumptions"
+      "personal boundaries"
     ]
   },
   {
-    "memory": "I did not vote for Trump; I voted for Kamala Harris.",
+    "memory": "I voted for Kamala Harris in the last presidential election.",
     "type": "belief",
     "tags": [
       "politics"
     ]
   },
   {
-    "memory": "I have a dream journal that spans over a couple of years.",
+    "memory": "I think Trump is a fascist and shouldn't be in office.",
+    "type": "belief",
+    "tags": [
+      "politics"
+    ]
+  },
+  {
+    "memory": "I have a long dream journal that spans over a couple of years and includes random dreams.",
     "type": "event",
     "tags": [
       "dreams"
     ]
   },
   {
-    "memory": "I fell in love with Anushka, who is my partner and best friend.",
+    "memory": "My closest relationship is with my partner Anushka, with whom I spend nearly all my time.",
     "type": "biographical",
     "tags": [
-      "relationship",
-      "social_connection"
+      "relationships",
+      "Anushka"
+    ]
+  },
+  {
+    "memory": "I believe Anushka makes me a better person and we keep each other entertained.",
+    "type": "belief",
+    "tags": [
+      "relationships",
+      "positivity"
     ]
   },
   {
@@ -214,156 +244,59 @@
     "type": "biographical",
     "tags": [
       "family",
-      "brother",
-      "relationships"
+      "brother"
     ]
   },
   {
-    "memory": "I always felt a strong desire to take care of and treat my siblings well.",
+    "memory": "I have always gotten along well with my little sister, who is seven years younger than me.",
+    "type": "biographical",
+    "tags": [
+      "family",
+      "sister"
+    ]
+  },
+  {
+    "memory": "My mother has always been an important person in my life and is like a superhero in my eyes.",
+    "type": "biographical",
+    "tags": [
+      "family",
+      "mother"
+    ]
+  },
+  {
+    "memory": "My father is a creative person who loves Star Wars, fantasy, and sci-fi.",
+    "type": "biographical",
+    "tags": [
+      "family",
+      "father"
+    ]
+  },
+  {
+    "memory": "I have been fortunate to have made good friends wherever I go.",
     "type": "belief",
     "tags": [
-      "family",
-      "relationships",
-      "care"
+      "friendship",
+      "social relationships"
     ]
   },
   {
-    "memory": "I enjoy playing video games with my brother Wolf and have done so since we were kids.",
-    "type": "preference",
-    "tags": [
-      "hobbies",
-      "gaming",
-      "family"
-    ]
-  },
-  {
-    "memory": "I have a close relationship with my little sister, who is seven years younger than me.",
-    "type": "biographical",
-    "tags": [
-      "family",
-      "sister",
-      "relationships"
-    ]
-  },
-  {
-    "memory": "I grew very close to my mother who I view as a superhero for all she has done for me and my family.",
-    "type": "belief",
-    "tags": [
-      "family",
-      "mother",
-      "gratitude"
-    ]
-  },
-  {
-    "memory": "I moved to Germany with my family when I was a teenager.",
-    "type": "event",
-    "tags": [
-      "biography",
-      "family",
-      "relocation"
-    ]
-  },
-  {
-    "memory": "I have a good relationship with my father, who is creative and supportive of my interests.",
-    "type": "biographical",
-    "tags": [
-      "family",
-      "father",
-      "support"
-    ]
-  },
-  {
-    "memory": "I have known my best friend Lucas Witzka since kindergarten, and our relationship has remained strong throughout our lives.",
+    "memory": "Lucas Witzka, my best friend, and I met in kindergarten and have a strong relationship.",
     "type": "biographical",
     "tags": [
       "friendship",
-      "support",
-      "history"
+      "long-term"
     ]
   },
   {
-    "memory": "I lived with my friend Ulyss throughout high school, and I consider him to be like a twin brother.",
+    "memory": "I lived with my friend Ulyss during high school, and he became almost like a twin brother to me.",
     "type": "biographical",
     "tags": [
       "friendship",
-      "living situation",
-      "support"
+      "roommate"
     ]
   },
   {
-    "memory": "I have a close friendship with Tom Spiegel, a friend I met in public school in Germany.",
-    "type": "biographical",
-    "tags": [
-      "friendship",
-      "school",
-      "Germany"
-    ]
-  },
-  {
-    "memory": "My best friend at SCAD is Ben Hammond, who I met during my time at the college.",
-    "type": "biographical",
-    "tags": [
-      "friendship",
-      "school",
-      "SCAD"
-    ]
-  },
-  {
-    "memory": "I consider myself a procrastinator, which negatively affects my work quality and general health.",
-    "type": "belief",
-    "tags": [
-      "self-assessment",
-      "work",
-      "health"
-    ]
-  },
-  {
-    "memory": "I typically prefer to wake up early and try to get eight hours of sleep, but often end up with less due to schoolwork.",
-    "type": "biographical",
-    "tags": [
-      "sleep",
-      "routine",
-      "school"
-    ]
-  },
-  {
-    "memory": "I enjoy listening to music daily, especially while working out or during my daily routines.",
-    "type": "preference",
-    "tags": [
-      "music",
-      "daily routine",
-      "hobbies"
-    ]
-  },
-  {
-    "memory": "My main hobbies include drawing, making music, and exploring immersive media.",
-    "type": "skill",
-    "tags": [
-      "hobbies",
-      "creative",
-      "media"
-    ]
-  },
-  {
-    "memory": "I grew up loving fantasy and sci-fi genres, starting with Star Wars and Indiana Jones.",
-    "type": "preference",
-    "tags": [
-      "hobbies",
-      "movies",
-      "genres"
-    ]
-  },
-  {
-    "memory": "I had asthma growing up but I don't have many significant health problems now.",
-    "type": "biographical",
-    "tags": [
-      "health",
-      "childhood",
-      "self-assessment"
-    ]
-  },
-  {
-    "memory": "I currently have a pet bearded dragon named Sara Ali Khan.",
+    "memory": "I currently have a bearded dragon named Sara Ali Khan as my pet.",
     "type": "biographical",
     "tags": [
       "pets",
@@ -371,57 +304,107 @@
     ]
   },
   {
-    "memory": "I had a cat named Itchy who passed away in 2022 and was emotionally supportive throughout my life.",
+    "memory": "I had a cat named Itchy who died in 2022 and was my emotional support during high school.",
     "type": "biographical",
     "tags": [
       "pets",
-      "cat",
-      "loss"
+      "cat"
     ]
   },
   {
-    "memory": "I often go for runs in the morning as part of my routine.",
-    "type": "biographical",
+    "memory": "My main hobbies include drawing, making music, painting, and immersive media.",
+    "type": "preference",
     "tags": [
-      "exercise",
-      "routine",
-      "hobbies"
-    ]
-  },
-  {
-    "memory": "I tend to judge people's character based on first impressions but strive to understand their perspectives.",
-    "type": "belief",
-    "tags": [
-      "relationships",
-      "judgment",
-      "perspective"
-    ]
-  },
-  {
-    "memory": "I am passionate about learning and improving my creative processes.",
-    "type": "belief",
-    "tags": [
-      "creativity",
-      "self-improvement",
+      "hobbies",
       "art"
     ]
   },
   {
-    "memory": "I believe that AI is a necessary part of the future and should not be boycotted.",
-    "type": "belief",
+    "memory": "I love watching movies and my favorite genre growing up was sci-fi.",
+    "type": "preference",
     "tags": [
-      "technology",
-      "AI",
-      "future"
+      "movies",
+      "sci-fi"
     ]
   },
   {
-    "memory": "I have a defined morning routine that varies depending on my workload and class schedule.",
+    "memory": "I prefer to wake up early and generally do not like waking up later than 11 AM.",
+    "type": "preference",
+    "tags": [
+      "sleep",
+      "routine"
+    ]
+  },
+  {
+    "memory": "I like to run as part of my routine and believe personal health is important.",
+    "type": "belief",
+    "tags": [
+      "health",
+      "exercise"
+    ]
+  },
+  {
+    "memory": "I am a procrastinator and often compromise my work quality due to stress and last-minute tasks.",
+    "type": "belief",
+    "tags": [
+      "work habits",
+      "stress"
+    ]
+  },
+  {
+    "memory": "I enjoy listening to music, though I find it difficult to concentrate while working if the music has lyrics.",
+    "type": "preference",
+    "tags": [
+      "music",
+      "work habits"
+    ]
+  },
+  {
+    "memory": "I think I have anxiety, which affects how I perceive social situations and how I am perceived by others.",
+    "type": "belief",
+    "tags": [
+      "anxiety",
+      "social dynamics"
+    ]
+  },
+  {
+    "memory": "I find surrealism and expressionism particularly resonate with me as artistic aesthetics.",
+    "type": "belief",
+    "tags": [
+      "art",
+      "aesthetics"
+    ]
+  },
+  {
+    "memory": "I have an interest in the creative process and enjoy learning about how musicians create their work.",
+    "type": "belief",
+    "tags": [
+      "creativity",
+      "music"
+    ]
+  },
+  {
+    "memory": "I believe AI is a useful tool for creativity and productivity, despite concerns about digital privacy.",
+    "type": "belief",
+    "tags": [
+      "technology",
+      "AI"
+    ]
+  },
+  {
+    "memory": "My favorite streaming apps on my phone include WhatsApp, YouTube, and the music app.",
     "type": "biographical",
     "tags": [
-      "routine",
-      "work",
-      "classes"
+      "technology",
+      "apps"
+    ]
+  },
+  {
+    "memory": "I prefer using Safari for browsing on my phone and Chrome on my computer.",
+    "type": "biographical",
+    "tags": [
+      "technology",
+      "browsers"
     ]
   },
   {
@@ -441,7 +424,23 @@
     ]
   },
   {
-    "memory": "I believe in holding people accountable for their actions.",
+    "memory": "I care about the people I love a lot.",
+    "type": "belief",
+    "tags": [
+      "love",
+      "relationships"
+    ]
+  },
+  {
+    "memory": "I want to have a lasting positive impact on the world.",
+    "type": "belief",
+    "tags": [
+      "impact",
+      "values"
+    ]
+  },
+  {
+    "memory": "I believe in holding people accountable.",
     "type": "belief",
     "tags": [
       "accountability",
@@ -449,59 +448,43 @@
     ]
   },
   {
-    "memory": "I have a reactionary side when faced with unkindness.",
+    "memory": "I try to think very logically.",
     "type": "belief",
     "tags": [
-      "reaction",
-      "emotions"
-    ]
-  },
-  {
-    "memory": "I try to think logically.",
-    "type": "belief",
-    "tags": [
-      "logical",
+      "logic",
       "thinking"
     ]
   },
   {
-    "memory": "I have been trying to trust my intuition more recently.",
-    "type": "belief",
-    "tags": [
-      "intuition",
-      "emotions"
-    ]
-  },
-  {
-    "memory": "I feel out of touch with my emotions.",
+    "memory": "I struggle to trust my emotions and feel out of touch with them.",
     "type": "belief",
     "tags": [
       "emotions",
-      "awareness"
+      "self-awareness"
     ]
   },
   {
-    "memory": "My favorite book is A Fear and Loathing in Las Vegas.",
+    "memory": "I have favorite books, including 'A Fear and Loathing in Las Vegas.'",
     "type": "preference",
     "tags": [
-      "books",
-      "reading"
+      "reading",
+      "books"
     ]
   },
   {
-    "memory": "I really liked Mrs. Peregrine's Home for Peculiar Children.",
+    "memory": "I enjoyed 'Mrs. Peregrine's Home for Peculiar Children' while growing up.",
     "type": "preference",
     "tags": [
-      "books",
-      "reading"
+      "reading",
+      "books"
     ]
   },
   {
-    "memory": "My favorite children's book is Where the Wild Things Are.",
+    "memory": "One of my favorite children's books is 'Where the Wild Things Are.'",
     "type": "preference",
     "tags": [
-      "books",
-      "reading"
+      "reading",
+      "books"
     ]
   },
   {
@@ -513,87 +496,71 @@
     ]
   },
   {
-    "memory": "I really like the movie Trainspotting.",
+    "memory": "I really like the movie 'Trainspotting.'",
     "type": "preference",
     "tags": [
       "movies",
-      "film"
+      "favorites"
     ]
   },
   {
-    "memory": "I like the movie Everything, Everywhere, All at Once.",
+    "memory": "I like the movie 'Everything, Everywhere, All at Once.'",
     "type": "preference",
     "tags": [
       "movies",
-      "film"
+      "favorites"
     ]
   },
   {
-    "memory": "I love Star Wars.",
+    "memory": "I love 'Star Wars.'",
     "type": "preference",
     "tags": [
       "movies",
-      "sci-fi"
+      "favorites"
     ]
   },
   {
-    "memory": "I prefer dramas over romantic comedies.",
+    "memory": "I like dramas and funny movies, but I'm not into romantic comedies.",
     "type": "preference",
     "tags": [
       "movies",
-      "genres"
+      "favorites"
     ]
   },
   {
-    "memory": "I like funny movies.",
+    "memory": "I enjoy Wes Anderson's movies.",
     "type": "preference",
     "tags": [
       "movies",
-      "comedy"
+      "favorites"
     ]
   },
   {
-    "memory": "I like Wes Anderson films.",
+    "memory": "I like playing Minecraft, and it's one of my favorite games.",
     "type": "preference",
     "tags": [
-      "movies",
-      "directors"
+      "gaming",
+      "favorites"
     ]
   },
   {
-    "memory": "I like Minecraft.",
-    "type": "preference",
-    "tags": [
-      "games",
-      "video games"
-    ]
-  },
-  {
-    "memory": "I was into Sea of Thieves for a long time.",
-    "type": "preference",
-    "tags": [
-      "games",
-      "video games"
-    ]
-  },
-  {
-    "memory": "I played Rainbow Six Siege a lot with my brother.",
+    "memory": "I played a lot of 'Sea of Thieves' with my middle school friends.",
     "type": "event",
     "tags": [
-      "games",
-      "video games"
+      "gaming",
+      "youth"
     ]
   },
   {
-    "memory": "I played a lot of Helldivers, which is a sci-fi game.",
+    "memory": "My brother and I played 'Rainbow Six Siege' together.",
     "type": "event",
     "tags": [
-      "games",
-      "video games"
+      "gaming",
+      "family"
     ]
   },
   {
-    "memory": "I was never into console gaming; I mainly played on PC.",
+    "memory": "I was mainly on PC for gaming.",
     "type": "biographical",
     "tags": [
       "gaming",
@@ -601,123 +568,67 @@
     ]
   },
   {
-    "memory": "I enjoyed classic Nintendo games like Plants vs. Zombies and Bomberman.",
-    "type": "event",
-    "tags": [
-      "games",
-      "nostalgia"
-    ]
-  },
-  {
-    "memory": "I like Breaking Bad and Better Call Saul.",
+    "memory": "I loved 'Gravity Falls' growing up.",
     "type": "preference",
     "tags": [
       "TV shows",
-      "drama"
+      "favorites"
     ]
   },
   {
-    "memory": "I loved Gravity Falls growing up.",
-    "type": "preference",
-    "tags": [
-      "TV shows",
-      "nostalgia"
-    ]
-  },
-  {
-    "memory": "I like mystery and puzzle-solving.",
-    "type": "preference",
-    "tags": [
-      "hobbies",
-      "interests"
-    ]
-  },
-  {
-    "memory": "I like classic rock music.",
+    "memory": "I like classic rock music, and it will always be my comfort genre.",
     "type": "preference",
     "tags": [
       "music",
-      "genres"
+      "favorites"
     ]
   },
   {
-    "memory": "Classic rock is my comfort genre.",
-    "type": "belief",
-    "tags": [
-      "music",
-      "comfort"
-    ]
-  },
-  {
-    "memory": "My favorite classic rock artists include The Beatles, Queen, and David Bowie.",
-    "type": "preference",
-    "tags": [
-      "music",
-      "artists"
-    ]
-  },
-  {
-    "memory": "Child of Vision by Supertramp is one of my favorite songs.",
-    "type": "preference",
-    "tags": [
-      "music",
-      "favorite songs"
-    ]
-  },
-  {
-    "memory": "I find the quote from Helplessness Blues by Fleet Foxes relatable.",
-    "type": "belief",
-    "tags": [
-      "music",
-      "relatable"
-    ]
-  },
-  {
-    "memory": "I enjoy conspiracy theories and find them entertaining.",
-    "type": "preference",
-    "tags": [
-      "interests",
-      "entertainment"
-    ]
-  },
-  {
-    "memory": "I find Hindu mythology beautiful and meaningful.",
+    "memory": "I find Hindu mythology extremely beautiful.",
     "type": "belief",
     "tags": [
       "mythology",
-      "spirituality"
+      "beliefs"
     ]
   },
   {
-    "memory": "I experience pauses and uncertainty when answering questions.",
-    "type": "skill",
+    "memory": "I think a lot of conspiracy theories are funny and entertaining.",
+    "type": "belief",
     "tags": [
-      "communication",
-      "speech"
+      "entertainment",
+      "beliefs"
     ]
   },
   {
-    "memory": "I try to speak quicker when asked to, but I normally speak slowly.",
-    "type": "skill",
+    "memory": "I feel socially quiet in many situations when I'm not comfortable.",
+    "type": "belief",
     "tags": [
-      "communication",
-      "speech"
+      "social",
+      "self-awareness"
     ]
   },
   {
-    "memory": "I like to joke and laugh with people.",
-    "type": "preference",
+    "memory": "I feel like I observe the world around me more than contribute sometimes.",
+    "type": "belief",
     "tags": [
-      "interpersonal",
+      "self-awareness",
       "social"
     ]
   },
   {
-    "memory": "I can do impressions and poke fun at little things people say.",
+    "memory": "I think I can do impressions and enjoy poking fun at things people say.",
     "type": "skill",
     "tags": [
-      "interpersonal",
-      "humor"
+      "humor",
+      "impressions"
+    ]
+  },
+  {
+    "memory": "I try to speak quickly, but I normally speak pretty slowly.",
+    "type": "biographical",
+    "tags": [
+      "speech",
+      "biography"
     ]
   }
 ]

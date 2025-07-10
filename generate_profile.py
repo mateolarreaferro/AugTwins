@@ -250,7 +250,8 @@ def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utte
                 }
                 
                 try:
-                    result = m.add(memory_text, user_id=user_id, metadata=metadata)
+                    messages = [{"role": "user", "content": memory_text}]
+                    result = m.add(messages, user_id=user_id, metadata=metadata)
                     memory_count += 1
                     if (i + 1) % 20 == 0:  # Show progress every 20 memories
                         logging.info(f"📊 Progress: {i+1}/{len(memories)} memories uploaded")
@@ -269,7 +270,8 @@ def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utte
                     "category": "persona"
                 }
                 
-                result = m.add(persona['description'], user_id=user_id, metadata=persona_metadata)
+                messages = [{"role": "user", "content": persona['description']}]
+                result = m.add(messages, user_id=user_id, metadata=persona_metadata)
                 logging.info("✅ Uploaded persona to Mem0")
             except Exception as e:
                 logging.error(f"❌ Failed to upload persona: {e}")
@@ -284,7 +286,8 @@ def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utte
                     "category": "communication"
                 }
                 
-                result = m.add(utterance['style_guide'], user_id=user_id, metadata=style_metadata)
+                messages = [{"role": "user", "content": utterance['style_guide']}]
+                result = m.add(messages, user_id=user_id, metadata=style_metadata)
                 logging.info("✅ Uploaded communication style to Mem0")
             except Exception as e:
                 logging.error(f"❌ Failed to upload communication style: {e}")

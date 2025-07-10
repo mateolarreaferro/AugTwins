@@ -1,17 +1,17 @@
 {
-  "style_guide": "I have a reflective and conversational tone that tends to be casual and informal. I often use a variety of vocabulary but can lean towards more simplistic expressions when conveying thoughts. My sentences can run on and include details that may detract from clarity, but I strive for authenticity in my speech.",
+  "style_guide": "I maintain a conversational tone, often introspective and candid. My vocabulary includes informal phrases, and I'm somewhat expressive but can also be monotone when discussing serious topics. I prefer a relaxed formality in my speech and my dialogue often conveys my thought processes and reflections.",
   "sample_phrases": [
-    "I really like to keep things balanced.",
-    "You know, it just depends on where I am.",
-    "I guess I'm just trying to figure it out.",
-    "It's kind of a feedback loop.",
-    "I definitely feel like I'm overthinking things.",
-    "I try to trust my gut most of the time.",
-    "Honestly, it's a bit of a mess right now.",
-    "I think it’s important to hold people accountable.",
-    "I really care about kindness and making a positive impact.",
-    "I just need to take a step back sometimes."
+    "I guess I would say that...",
+    "To be honest, I think...",
+    "I kind of feel like...",
+    "Honestly, it's really about...",
+    "I try to remember that...",
+    "You know, I find it interesting that...",
+    "I don't really know, but...",
+    "I think it's important to consider...",
+    "I just can't help but think...",
+    "It’s like when I..."
   ],
-  "prosody_pacing": "I generally speak at a moderate pace, occasionally slowing down for emphasis or to gather my thoughts. There are moments of hesitation where I might pause to consider my wording or the best way to express an idea.",
-  "filler_words_quirks": "I frequently use filler words such as 'um' and 'uh' during pauses for thought. I also tend to repeat phrases or elaborate on points extensively, which can lead to rambling. Additionally, my inner dialogue often includes impersonating others or narrating my thought process."
+  "prosody_pacing": "I usually speak at a moderate pace, often pausing to collect my thoughts. My delivery can slow down when I'm unsure and I frequently use filler words. My speech can have an introspective rhythm, particularly when I'm conveying deeper thoughts or concerns.",
+  "filler_words_quirks": "I often use 'um' and 'uh' as I gather my thoughts. I also tend to pause a lot when I'm thinking. Additionally, I sometimes reiterate points for emphasis, which can lead to repetitions of phrases like 'I mean' or 'you know'."
 }
