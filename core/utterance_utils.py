@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional
+import json
 
 from . import llm_utils
 
@@ -13,7 +14,18 @@ _TRANS_DIR = Path("transcripts")
 
 
 def load_transcript(name: str) -> str:
-    """Return text from transcripts/<name>.txt if available."""
+    """Return style text from transcripts/<name>.json or <name>.txt if available."""
+    json_path = _TRANS_DIR / f"{name.lower()}.json"
+    if json_path.exists():
+        try:
+            data = json.loads(json_path.read_text(encoding="utf-8"))
+            style = data.get("style_guide", "")
+            phrases = data.get("sample_phrases", [])
+            phrase_block = "\n".join(f"- {p}" for p in phrases) if phrases else ""
+            return f"{style}\n{phrase_block}".strip()
+        except Exception:
+            return json_path.read_text(encoding="utf-8").strip()
+
     path = _TRANS_DIR / f"{name.lower()}.txt"
     if path.exists():
         return path.read_text(encoding="utf-8").strip()

@@ -89,7 +89,9 @@ MEMORY_PROMPT_SYSTEM = (
 
 PERSONA_PROMPT = (
     "You are an expert biographer. Based on the complete interview transcripts, "
-    "write an elaborate persona description capturing background, personality traits, interests, values, and communication style."
+    "summarize the speaker and infer their overall personality type. "
+    "Return ONLY valid JSON in the form: "
+    "{\"description\": <string>, \"personality_type\": <string>}"
 )
 
 UTTERANCE_PROMPT = (
@@ -231,15 +233,20 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     # Step 1: Memories
     memories = extract_memories(client, args.model, full_transcript, args.max_tokens)
 
-    # Step 2: Persona description 
-    persona_text = chat(
+    # Step 2: Persona description + personality type
+    persona_raw = chat(
         client,
         args.model,
         [
             {"role": "system", "content": PERSONA_PROMPT},
             {"role": "user", "content": trim_to_token_limit(full_transcript, MAX_MODEL_TOKENS // 2)},
         ],
-    ).strip()
+    )
+    try:
+        persona = json.loads(persona_raw)
+    except json.JSONDecodeError:
+        logging.warning("Persona JSON malformed – storing raw text as 'description'.")
+        persona = {"description": persona_raw.strip(), "personality_type": ""}
 
     # Step 3: Utterance style guide 
     utterance_raw = chat(
@@ -256,17 +263,20 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         logging.warning("Utterance JSON malformed – embedding raw text as 'style_guide'.")
         utterance = {"style_guide": utterance_raw.strip(), "sample_phrases": []}
 
-    # Assemble & write profile
-    profile: Dict[str, Any] = {
-        "name": args.person.capitalize(),
-        "persona": persona_text,
-        "memories": memories,
-        "utterance": utterance,
-    }
+    # ── Write separate artefacts
+    base_dir = transcripts_dir.parent
 
-    out_path = transcripts_dir.parent / "profile.json"
-    out_path.write_text(json.dumps(profile, indent=2, ensure_ascii=False))
-    logging.info("Profile written → %s", out_path)
+    mem_path = base_dir / "memories.json"
+    mem_path.write_text(json.dumps(memories, indent=2, ensure_ascii=False))
+    logging.info("Memories written → %s", mem_path)
+
+    persona_path = base_dir / "persona.json"
+    persona_path.write_text(json.dumps(persona, indent=2, ensure_ascii=False))
+    logging.info("Persona written → %s", persona_path)
+
+    utter_path = project_root / "transcripts" / f"{args.person.lower()}.json"
+    utter_path.write_text(json.dumps(utterance, indent=2, ensure_ascii=False))
+    logging.info("Utterance guide written → %s", utter_path)
 
 
 if __name__ == "__main__":
