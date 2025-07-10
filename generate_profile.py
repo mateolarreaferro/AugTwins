@@ -30,7 +30,7 @@ from openai import OpenAI, OpenAIError, RateLimitError  # type: ignore
 
 # Optional mem0 dependency
 try:
-    from mem0 import Memory  # type: ignore
+    from mem0 import MemoryClient  # type: ignore
     MEM0_AVAILABLE = True
 except ImportError:
     MEM0_AVAILABLE = False
@@ -218,80 +218,175 @@ def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utte
         return False
     
     try:
-        # Get Mem0 API key
-        mem0_api_key = os.getenv("MEM0_API_KEY")
-        if not mem0_api_key:
-            try:
-                from settings import MEM0_API_KEY
-                mem0_api_key = MEM0_API_KEY
-            except ImportError:
-                logging.warning("MEM0_API_KEY not found - skipping memory upload")
-                return False
+        # Get Mem0 Pro credentials
+        try:
+            from settings import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
+        except ImportError:
+            logging.warning("Mem0 Pro credentials not found in settings - skipping memory upload")
+            return False
         
-        # Initialize Mem0 client
-        os.environ["MEM0_API_KEY"] = mem0_api_key
-        m = Memory()
+        # Initialize Mem0 Pro client
+        m = MemoryClient(
+            api_key=MEM0_API_KEY,
+            org_id=MEM0_ORG_ID,
+            project_id=MEM0_PROJECT_ID
+        )
+        
+        logging.info(f"Starting Mem0 upload for user '{user_id}'...")
+        memory_count = 0
         
         # Upload memories
-        for memory in memories:
+        for i, memory in enumerate(memories):
             memory_text = memory.get("memory", "")
             memory_type = memory.get("type", "general")
             tags = memory.get("tags", [])
             
             if memory_text:
-                # Create a conversational message format for Mem0
-                messages = [
-                    {"role": "user", "content": f"Remember this about me: {memory_text}"},
-                    {"role": "assistant", "content": f"I'll remember that {memory_text}"}
-                ]
-                
                 metadata = {
                     "type": memory_type,
                     "tags": tags,
-                    "source": "profile_generation"
+                    "source": "profile_generation",
+                    "category": memory_type
                 }
                 
-                result = m.add(messages, user_id=user_id, metadata=metadata)
-                logging.debug(f"Added memory to Mem0: {memory_text[:50]}...")
+                try:
+                    result = m.add(memory_text, user_id=user_id, metadata=metadata)
+                    memory_count += 1
+                    if (i + 1) % 20 == 0:  # Show progress every 20 memories
+                        logging.info(f"📊 Progress: {i+1}/{len(memories)} memories uploaded")
+                except Exception as e:
+                    logging.error(f"❌ Failed to add memory {i+1}: {e}")
+        
+        logging.info(f"Uploaded {memory_count}/{len(memories)} memories to Mem0")
         
         # Upload persona information
         if persona.get("description"):
-            persona_messages = [
-                {"role": "user", "content": f"This is my personality profile: {persona['description']}"},
-                {"role": "assistant", "content": f"I understand your personality profile. You are {persona.get('personality_type', 'unique')}."}
-            ]
-            
-            persona_metadata = {
-                "type": "persona",
-                "personality_type": persona.get("personality_type", ""),
-                "source": "profile_generation"
-            }
-            
-            m.add(persona_messages, user_id=user_id, metadata=persona_metadata)
-            logging.info("Uploaded persona to Mem0")
+            try:
+                persona_metadata = {
+                    "type": "persona",
+                    "personality_type": persona.get("personality_type", ""),
+                    "source": "profile_generation",
+                    "category": "persona"
+                }
+                
+                result = m.add(persona['description'], user_id=user_id, metadata=persona_metadata)
+                logging.info("✅ Uploaded persona to Mem0")
+            except Exception as e:
+                logging.error(f"❌ Failed to upload persona: {e}")
         
         # Upload utterance style guide
         if utterance.get("style_guide"):
-            style_messages = [
-                {"role": "user", "content": f"This is how I speak and communicate: {utterance['style_guide']}"},
-                {"role": "assistant", "content": "I'll remember your communication style and speech patterns."}
-            ]
-            
-            style_metadata = {
-                "type": "communication_style",
-                "sample_phrases": utterance.get("sample_phrases", []),
-                "source": "profile_generation"
-            }
-            
-            m.add(style_messages, user_id=user_id, metadata=style_metadata)
-            logging.info("Uploaded communication style to Mem0")
+            try:
+                style_metadata = {
+                    "type": "communication_style",
+                    "sample_phrases": utterance.get("sample_phrases", []),
+                    "source": "profile_generation",
+                    "category": "communication"
+                }
+                
+                result = m.add(utterance['style_guide'], user_id=user_id, metadata=style_metadata)
+                logging.info("✅ Uploaded communication style to Mem0")
+            except Exception as e:
+                logging.error(f"❌ Failed to upload communication style: {e}")
         
-        logging.info(f"Successfully uploaded profile to Mem0 for user: {user_id}")
+        # Verify upload by checking memory count
+        try:
+            all_memories = m.get_all(user_id=user_id)
+            total_memories = len(all_memories) if all_memories else 0
+            logging.info(f"🔍 Verification: Found {total_memories} total memories for user '{user_id}' in Mem0")
+            
+            if total_memories > 0:
+                logging.info(f"📊 Memory breakdown for '{user_id}':")
+                # Group by type
+                type_counts = {}
+                for mem in all_memories:
+                    if isinstance(mem, dict):
+                        mem_type = mem.get('metadata', {}).get('type', 'unknown')
+                    else:
+                        mem_type = 'unknown'
+                    type_counts[mem_type] = type_counts.get(mem_type, 0) + 1
+                
+                for mem_type, count in type_counts.items():
+                    logging.info(f"  - {mem_type}: {count} memories")
+                    
+                logging.info(f"💡 Check Mem0 dashboard for user ID: '{user_id}'")
+            else:
+                logging.warning("⚠️  No memories found after upload - check Mem0 dashboard manually")
+                
+        except Exception as e:
+            logging.warning(f"Could not verify upload: {e}")
+        
+        logging.info(f"🎉 Successfully completed Mem0 upload for user: {user_id}")
         return True
         
     except Exception as e:
         logging.error(f"Failed to upload to Mem0: {e}")
         return False
+
+
+def verify_mem0_data(user_id: str) -> None:
+    """Verify and display what's stored in Mem0 for a user."""
+    if not MEM0_AVAILABLE:
+        logging.error("Mem0 not available - install with: pip install mem0ai")
+        return
+    
+    try:
+        # Get Mem0 Pro credentials
+        try:
+            from settings import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
+        except ImportError:
+            logging.error("Mem0 Pro credentials not found in settings")
+            return
+        
+        # Initialize Mem0 Pro client
+        m = MemoryClient(
+            api_key=MEM0_API_KEY,
+            org_id=MEM0_ORG_ID,
+            project_id=MEM0_PROJECT_ID
+        )
+        
+        # Get all memories for the user
+        all_memories = m.get_all(user_id=user_id)
+        
+        if not all_memories:
+            logging.info(f"No memories found for user '{user_id}' in Mem0")
+            return
+        
+        logging.info(f"📊 Found {len(all_memories)} memories for user '{user_id}' in Mem0:")
+        
+        # Group by memory type
+        memory_types = {}
+        for memory in all_memories:
+            if isinstance(memory, dict):
+                memory_type = memory.get('metadata', {}).get('type', 'unknown')
+            else:
+                memory_type = 'text_memory'
+            if memory_type not in memory_types:
+                memory_types[memory_type] = []
+            memory_types[memory_type].append(memory)
+        
+        for mem_type, mems in memory_types.items():
+            logging.info(f"  - {mem_type}: {len(mems)} memories")
+        
+        # Show recent memories
+        logging.info(f"\n🔍 Sample memories:")
+        for i, memory in enumerate(all_memories[:5]):
+            if isinstance(memory, dict):
+                content = memory.get('memory', memory.get('text', 'No content'))
+                mem_type = memory.get('metadata', {}).get('type', 'unknown')
+            elif isinstance(memory, str):
+                content = memory
+                mem_type = 'unknown'
+            else:
+                content = str(memory)
+                mem_type = 'unknown'
+            logging.info(f"  {i+1}. [{mem_type}] {content[:80]}...")
+        
+        if len(all_memories) > 5:
+            logging.info(f"  ... and {len(all_memories) - 5} more")
+            
+    except Exception as e:
+        logging.error(f"Failed to verify Mem0 data: {e}")
 
 
 def parse_args(argv: List[str] | None = None) -> argparse.Namespace:  # pragma: no cover
@@ -302,6 +397,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:  # pragma: 
     parser.add_argument("--verbose", "-v", action="count", default=0, help="Increase log verbosity (-v or -vv)")
     parser.add_argument("--upload-mem0", action="store_true", help="Upload generated profile to Mem0 memory system")
     parser.add_argument("--mem0-user-id", help="User ID for Mem0 upload (defaults to person name)")
+    parser.add_argument("--verify-mem0", action="store_true", help="Verify what's stored in Mem0 for the user")
     return parser.parse_args(argv)
 
 
@@ -312,6 +408,12 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         level=logging.DEBUG if args.verbose > 1 else logging.INFO if args.verbose else logging.WARNING,
         format="%(levelname)s | %(message)s",
     )
+
+    # Handle verification only mode
+    if args.verify_mem0:
+        user_id = args.mem0_user_id or args.person.lower()
+        verify_mem0_data(user_id)
+        return
 
     project_root = Path(__file__).resolve().parent  # current directory is project root
     transcripts_dir = project_root / "interviews" / args.person / "transcripts"

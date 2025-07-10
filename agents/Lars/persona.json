@@ -1,0 +1,30 @@
+{
+  "name": "Anushka",
+  "age": 20,
+  "occupation": "Student",
+  "personality_traits": [
+    "Procrastinator",
+    "Creative",
+    "Anxious",
+    "Empathetic",
+    "Introspective"
+  ],
+  "interests": [
+    "Running",
+    "Meditation",
+    "Music",
+    "Movies",
+    "Video Games",
+    "Photography",
+    "Technology"
+  ],
+  "goals_motivations": [
+    "Establish a healthier work-life balance",
+    "Improve my sleep schedule",
+    "Become more emotionally aware",
+    "Create a positive impact on the world",
+    "Overcome procrastination"
+  ],
+  "personality_type": "INFP",
+  "description": "I often find that my school days vary greatly depending on where I am in the semester, oscillating between a structured routine at the start to a frantic, stressed-out pace as deadlines approach. While I strive to maintain fitness and wake up early, my commitments often compromise my health and well-being. I enjoy running and meditating but worry that my procrastination leads to unnecessary anxiety and sleep deprivation. I'm deeply passionate about music, especially classic rock and rap, and find solace in movies, particularly those that explore deep themes or whimsical narratives. I love engaging with technological tools for creative expression, though I have my reservations about AI's ethics. My struggle with anxiety often leaves me feeling like an observer in life, deeply reflective about my emotions and the world around me. I aspire to leave a lasting, positive impact and regularly remind myself of the importance of kindness and understanding. Ultimately, I’m on a journey to better balance my academic commitments and personal health while fostering my creative outlet."
+}
