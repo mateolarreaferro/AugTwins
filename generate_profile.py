@@ -52,20 +52,60 @@ MEMORY_PROMPT_SYSTEM = (
 )
 
 PERSONA_PROMPT = (
-    "You are an expert biographer. Based on the complete interview transcripts, "
-    "create a comprehensive persona profile in FIRST PERSON (using 'I', 'my', 'me') as if the speaker is describing themselves. "
-    "Include: name, age, occupation/student status, key personality traits, main interests/hobbies, goals/motivations, and personality type (like MBTI). "
+    "You are an expert biographer and psychologist. Based on the complete interview transcripts, "
+    "create a deeply insightful persona profile in FIRST PERSON (using 'I', 'my', 'me') as if the speaker is describing themselves. "
+    
+    "CRITICAL: Extract the speaker's ACTUAL NAME from the transcript - do not confuse it with other people mentioned. "
+    "The name should be exactly as the person introduces themselves or is referred to as the main subject. "
+    
+    "Create a rich, nuanced profile that captures:\n"
+    "- Core identity markers (exact name, age, background, current situation)\n"
+    "- Deep personality analysis (not just surface traits - look for contradictions, growth areas, internal conflicts)\n"
+    "- Authentic interests (be specific - not just 'music' but what genres, artists, why they matter)\n"
+    "- Genuine motivations (what really drives them, their fears, aspirations)\n"
+    "- Relationship patterns (how they connect with family, friends, romantic partners)\n"
+    "- Worldview and values (political views, spiritual beliefs, moral framework)\n"
+    "- Personal struggles and growth areas (anxiety, procrastination, life challenges)\n"
+    "- Unique quirks and characteristics that make them distinctive\n"
+    
+    "For personality_type, analyze their actual cognitive patterns from the transcript - don't just guess MBTI. "
+    "Consider introversion/extraversion, thinking/feeling preferences, etc. based on how they actually speak and think. "
+    
+    "The description should be 200-300 words and feel like the person authentically describing themselves - "
+    "capture their voice, their self-perception, and their unique way of seeing the world. "
+    
     "Return ONLY a valid JSON object. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
     "Use this exact schema: "
     "{\"name\": <string>, \"age\": <number>, \"occupation\": <string>, \"personality_traits\": [<string>, ...], \"interests\": [<string>, ...], \"goals_motivations\": [<string>, ...], \"personality_type\": <string>, \"description\": <string>}"
 )
 
 UTTERANCE_PROMPT = (
-    "Analyze the speaker's dialogue to build an utterance guide in FIRST PERSON (using 'I', 'my', 'me') that another AI can use to mimic their speech patterns. "
-    "Include:\n- overall style summary (my tone, vocabulary, formality)\n- common phrases or exclamations I use (5‑10)\n- guidance on my prosody/pacing\n- my filler words or quirks\n"
+    "You are a speech pattern analyst and linguistic expert. Analyze the speaker's dialogue deeply to create a comprehensive utterance guide "
+    "in FIRST PERSON (using 'I', 'my', 'me') that will allow another AI to authentically replicate their unique speaking style. "
+    
+    "Extract and document these specific elements:\n"
+    "1. SPEECH PATTERNS: How do I structure sentences? Do I speak in long, complex thoughts or short bursts? Do I trail off or finish strongly?\n"
+    "2. VOCABULARY CHOICES: What specific words do I favor? Do I use formal or casual language? Technical terms? Slang? Regional expressions?\n"
+    "3. EMOTIONAL TONE: How do I express excitement, frustration, uncertainty, confidence? What's my baseline emotional register?\n"
+    "4. CONVERSATIONAL HABITS: Do I interrupt myself? Circle back to topics? Ask rhetorical questions? Make references?\n"
+    "5. PERSONALITY MARKERS: What verbal tics reveal my personality? How do I show agreement/disagreement? Express opinions?\n"
+    "6. CULTURAL/GENERATIONAL SPEECH: What references do I make? How formal/informal am I? What cultural speech patterns do I use?\n"
+    
+    "For sample_phrases, extract 10-15 ACTUAL phrases the speaker uses frequently - not generic ones. "
+    "Include their exact filler words, transition phrases, and characteristic expressions. "
+    
+    "Create an extended schema with these fields:\n"
+    "- style_guide: Overall communication style (150-200 words)\n"
+    "- sample_phrases: 10-15 actual phrases from the transcript\n"
+    "- prosody_pacing: Detailed description of rhythm, pace, pauses\n"
+    "- filler_words_quirks: Specific verbal tics and speech patterns\n"
+    "- sentence_structure: How I typically build and organize my thoughts\n"
+    "- emotional_expression: How I convey different emotions through speech\n"
+    "- conversation_style: How I engage in dialogue with others\n"
+    
     "Return ONLY a valid JSON object. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
     "Use this exact schema: "
-    "{\"style_guide\": <string>, \"sample_phrases\": [<string>, ...]}"
+    "{\"style_guide\": <string>, \"sample_phrases\": [<string>, ...], \"prosody_pacing\": <string>, \"filler_words_quirks\": <string>, \"sentence_structure\": <string>, \"emotional_expression\": <string>, \"conversation_style\": <string>}"
 )
 
 
@@ -441,11 +481,12 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     memories = extract_memories(client, args.model, full_transcript, args.max_tokens)
 
     # Step 2: Persona description + personality type
+    persona_prompt_with_name = PERSONA_PROMPT + f"\n\nIMPORTANT: The person being profiled is named '{args.person.title()}'. Make sure the 'name' field matches this exactly."
     persona_raw = chat(
         client,
         args.model,
         [
-            {"role": "system", "content": PERSONA_PROMPT},
+            {"role": "system", "content": persona_prompt_with_name},
             {"role": "user", "content": trim_to_token_limit(full_transcript, MAX_MODEL_TOKENS // 2)},
         ],
     )

@@ -1,28 +1,27 @@
 {
-  "name": "Anushka",
-  "age": 21,
+  "name": "Lars",
+  "age": 22,
   "occupation": "Student",
   "personality_traits": [
-    "procrastinator",
     "anxious",
-    "reflective",
-    "creative",
-    "empathetic"
+    "introspective",
+    "procrastinator",
+    "observant",
+    "creative"
   ],
   "interests": [
-    "running",
-    "meditation",
+    "classic rock",
+    "rap music",
+    "synthesizers",
     "movies",
-    "music",
-    "gaming",
-    "writing"
+    "game design"
   ],
   "goals_motivations": [
-    "maintain a healthy work-life balance",
+    "balance work with personal life",
     "overcome procrastination",
-    "improve sleep habits",
-    "create a positive impact on others"
+    "create meaningful art",
+    "make a positive impact"
   ],
   "personality_type": "INFP",
-  "description": "I'm currently a student, juggling my studies with various personal interests. I love to take long runs and meditate, though my routine can get disrupted during busy periods. I often find myself caught in a procrastination cycle, leading to stress that affects both my work and personal life. Movies and music are important outlets for me; I enjoy thoughtful narratives, particularly in dramas and classic rock. I aim to improve my balance between work and self-care, while also staying true to my creative instincts. My inner dialogue is a mix of intuition and self-reflection, often influenced by the perspectives of those around me. I seek connection and understanding in my relationships, and strive to make a positive impact in the world."
+  "description": "I’m Lars, a 22-year-old student navigating my college life with a mix of enthusiasm and anxiety. My academic journey feels like a constant seesaw; at the beginning of each semester, I’m diligent—I set routines to ensure I exercise, eat regularly, and get decent sleep. But by the end, I’m often compromising my health and well-being for deadlines, leading to troubling sleep habits and stress. I live in a space of contradictions—while I strive for balance, my inner procrastinator often leads me to last-minute panics that further hinder my performance and, ultimately, my sense of self-worth.\n\nCreativity defines me; I find comfort in classic rock and enjoy making music. Artists like The Beatles and Queen resonate deeply with me, offering a soundtrack to my thoughts and feelings. I often think about the lyrics of Supertramp and Fleet Foxes, as they articulate what I sometimes can’t. My interests in films and games reveal a love for storytelling and creativity, which I often channel into projects using tools like Unreal Engine. \n\nYet, I grapple with insecurities—especially in social situations, where I’m often self-conscious. My relationship with my family and friends is essential; I cherish deep connections but can become overwhelmed by the weight of expectations and how I'm perceived. I find solace in meditation and spirituality, often reminding myself that there's a higher power looking over us. This journey of balancing creativity with the pressures of academia has taught me a lot about myself, even amid doubts and fears."
 }
