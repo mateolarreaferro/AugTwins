@@ -4,25 +4,16 @@ from typing import Dict
 from core import seed_db
 
 # Agents
-from seeds.dunya import dunya, SEED_MEMORIES as DUNYA_MEM
 from seeds.lars import lars, SEED_MEMORIES as LARS_MEM
-from seeds.anushhka import anushhka, SEED_MEMORIES as ANUSHHKA_MEM
-from seeds.mateo import mateo, SEED_MEMORIES as MATEO_MEM
 
 from core.memory_utils import load_memories, save_memories, summarize_recent
 
 SEEDS: Dict[str, list[str]] = {
-    "dünya": DUNYA_MEM,
-    "anushhka": ANUSHHKA_MEM,
-    "mateo": MATEO_MEM,
     "lars": LARS_MEM
 }
 
 AGENTS = {
-    "dünya": dunya,
     "lars": lars,
-    "anushhka": anushhka,
-    "mateo": mateo,
 }
 
 

@@ -24,12 +24,7 @@ SOURCE_FILES = [
     "core/llm_utils.py",
     "core/agent.py",
     "core/memory_utils.py",
-    "seeds/yuvraj.py",
-    "seeds/dunya.py",
     "seeds/lars.py",
-    "seeds/anushhka.py",
-    "seeds/mateo.py",
-    "seeds/alif.py",
 ]
 
 
