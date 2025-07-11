@@ -1,45 +1,61 @@
-# Aug Lab Digital Twins
+# AugTwins - Digital Twin Chat System
 
 ## Setup
 
-Create a virtual environment and install the requirements:
+1. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-Running `app.py` requires the packages in `requirements.txt`.  The tests stub out
-heavy dependencies so they can run without network access.
+3. Create `settings.py` with your API keys:
+```python
+OPENAI_API_KEY = "your-openai-api-key"
+ELEVEN_API_KEY = "your-elevenlabs-api-key"
 
-## Interviews and profiles
-
-Raw interview transcripts should live under `interviews/<person>/transcripts/`.
-You can generate these text files from audio using `interviews/transcribe.py`.
-
-Once you have the `.txt` transcripts, run `python generate_profile.py <person>`
-from the project root. This will create three artefacts:
-
-1. `agents/<Person>/memories.json` – structured memories extracted from the
-   transcripts (in first person perspective).
-2. `agents/<Person>/persona.json` – a persona description and inferred
-   personality type (in first person perspective).
-3. `agents/<Person>/utterance.json` – an utterance style guide referenced by the
-   agent profile (see `agents/Lars/lars.py`). The `agents/` directory is created
-   automatically if it does not exist.
-
-## Mem0 Integration
-
-To upload the generated profile to Mem0 memory system, use the `--upload-mem0` flag:
-
-```bash
-python generate_profile.py lars --upload-mem0
+# Mem0 Pro Configuration (optional)
+MEM0_API_KEY = "your-mem0-api-key"
+MEM0_ORG_ID = "your-mem0-org-id"
+MEM0_PROJECT_ID = "your-mem0-project-id"
 ```
 
-Optional arguments:
-- `--mem0-user-id <id>`: Specify a custom user ID for Mem0 (defaults to person name)
-- `--verbose`: Enable verbose logging to see upload progress
+## Running the Application
 
-Requirements:
-- Mem0 API key in `settings.py` or environment variable `MEM0_API_KEY`
-- Install mem0ai: `pip install mem0ai` (already in requirements.txt)
+Start the chat interface:
+```bash
+python app.py
+```
+
+Commands during chat:
+- Type normally to chat with the current agent
+- `agent <name>` - Switch to a different agent
+- `save` - Save conversation history
+- `exit` - Quit
+
+## Creating Digital Twins from Interviews
+
+1. **Transcribe audio interviews:**
+   Place audio files in `interviews/<person>/transcripts/` and run:
+   ```bash
+   python interviews/transcribe.py
+   ```
+
+2. **Generate agent profile:**
+   ```bash
+   python generate_profile.py <person>
+   ```
+   This creates three JSON files in `agents/<Person>/`:
+   - `memories.json` - Extracted personal memories
+   - `persona.json` - Personality profile
+   - `utterance.json` - Speech patterns and style
+
+3. **Upload to Mem0 (optional):**
+   ```bash
+   python generate_profile.py <person> --upload-mem0
+   ```
 
