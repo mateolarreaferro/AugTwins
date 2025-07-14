@@ -9,3 +9,5 @@ tiktoken>=0.6
 tqdm>=4.66
 mem0ai>=0.1.0
 elevenlabs>=1.0.0      # for text-to-speech functionality
+flask>=2.3.0           # web framework for API endpoints
+flask-cors>=4.0.0      # for cross-origin requests

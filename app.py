@@ -1,7 +1,9 @@
-"""Terminal chat launcher for AugTwins."""
+"""Flask web application for AugTwins - connects backend with Unreal Engine."""
 import json
 from datetime import datetime
 from pathlib import Path
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 
 # Agents
 from agents.Lars.lars import lars
@@ -9,6 +11,14 @@ from agents.Lars.lars import lars
 AGENTS = {
     "lars": lars,
 }
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)  # Enable CORS for Unreal Engine integration
+
+# Global state
+current_agent = lars
+conversation_history = []
 
 
 def load_agent(agent) -> None:
@@ -101,68 +111,117 @@ def save_new_memories_to_mem0(agent, conversations: list) -> None:
         print(f"[{agent.name}] Error saving memories to Mem0: {e}")
 
 
-def main() -> None:
-    current = AGENTS["lars"]
-    load_agent(current)
-    conversation_history = []
-    print(
-        "\n=== Digital Twin Chat ===\n"
-        "Commands: agent <name>  save  exit\n"
-    )
-    try:
-        while True:
-            msg = input(f"You → {current.name}: ").strip()
-            if not msg:
-                continue
-            cmd = msg.lower()
-            if cmd == "exit":
-                break
-            if cmd.startswith("agent "):
-                new = cmd.split(maxsplit=1)[1]
-                if new in AGENTS:
-                    # Save conversation history before switching
-                    if conversation_history:
-                        save_conversation_history(current, conversation_history)
-                        conversation_history = []
-                    current = AGENTS[new]
-                    load_agent(current)
-                    print(f"[Switched to {current.name}]\n")
-                else:
-                    print("[Unknown agent]\n")
-                continue
-            if cmd == "save":
-                if conversation_history:
-                    save_conversation_history(current, conversation_history)
-                    conversation_history = []
-                print("[Conversation history saved]\n")
-                continue
+# Flask Routes
 
-            reply = current.generate_response(msg)
-            print(f"{current.name}: {reply}\n")
-            
-            # Add to conversation history
-            conversation_history.append({
-                "user": msg,
-                "agent": reply,
-                "timestamp": datetime.now().isoformat()
-            })
-            
-            current.speak(reply)
-    finally:
-        # Save final conversation history
-        if conversation_history:
-            save_conversation_history(current, conversation_history)
-            
-            # Ask user if they want to save new memories to Mem0
-            try:
-                save_memories = input("\nWould you like to save the new memories from this conversation to Mem0? (y/n): ").strip().lower()
-                if save_memories in ['y', 'yes']:
-                    save_new_memories_to_mem0(current, conversation_history)
-                else:
-                    print("New memories not saved to Mem0 (conversation history still saved locally).")
-            except (EOFError, KeyboardInterrupt):
-                print("\nNew memories not saved to Mem0.")
-        print("Goodbye!\n")
+@app.route('/')
+def index():
+    """Serve the debugging frontend."""
+    return render_template('index.html')
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    """Handle chat messages from frontend or Unreal Engine."""
+    global current_agent, conversation_history
+    
+    data = request.get_json()
+    message = data.get('message', '').strip()
+    
+    if not message:
+        return jsonify({'error': 'No message provided'}), 400
+    
+    try:
+        # Generate response
+        reply = current_agent.generate_response(message)
+        
+        # Add to conversation history
+        conversation_entry = {
+            "user": message,
+            "agent": reply,
+            "timestamp": datetime.now().isoformat()
+        }
+        conversation_history.append(conversation_entry)
+        
+        # Text-to-speech (optional)
+        audio_enabled = False
+        try:
+            current_agent.speak(reply)
+            audio_enabled = True
+        except Exception as e:
+            print(f"TTS failed: {e}")
+        
+        return jsonify({
+            'response': reply,
+            'agent': current_agent.name,
+            'timestamp': conversation_entry['timestamp'],
+            'audio_enabled': audio_enabled
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/switch-agent', methods=['POST'])
+def switch_agent():
+    """Switch to a different agent."""
+    global current_agent, conversation_history
+    
+    data = request.get_json()
+    agent_name = data.get('agent', '').lower()
+    
+    if agent_name not in AGENTS:
+        return jsonify({'error': f'Unknown agent: {agent_name}'}), 400
+    
+    # Save current conversation history
+    if conversation_history:
+        save_conversation_history(current_agent, conversation_history)
+        conversation_history = []
+    
+    # Switch agent
+    current_agent = AGENTS[agent_name]
+    load_agent(current_agent)
+    
+    return jsonify({
+        'current_agent': current_agent.name,
+        'message': f'Switched to {current_agent.name}'
+    })
+
+@app.route('/save-conversation', methods=['POST'])
+def save_conversation():
+    """Save current conversation history."""
+    global conversation_history
+    
+    if not conversation_history:
+        return jsonify({'message': 'No conversation to save'})
+    
+    try:
+        save_conversation_history(current_agent, conversation_history)
+        conversation_history = []
+        return jsonify({'message': 'Conversation history saved successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/agents', methods=['GET'])
+def get_agents():
+    """Get list of available agents."""
+    return jsonify({
+        'agents': list(AGENTS.keys()),
+        'current_agent': current_agent.name
+    })
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Unreal Engine integration."""
+    return jsonify({
+        'status': 'healthy',
+        'current_agent': current_agent.name,
+        'timestamp': datetime.now().isoformat()
+    })
 
 if __name__ == "__main__":
-    main()
+    # Initialize the default agent
+    load_agent(current_agent)
+    print(f"AugTwins Flask server starting with agent: {current_agent.name}")
+    print("Debug interface available at: http://localhost:5000")
+    print("API endpoints available for Unreal Engine integration")
+    
+    # Run Flask app
+    app.run(host='0.0.0.0', port=5000, debug=True)

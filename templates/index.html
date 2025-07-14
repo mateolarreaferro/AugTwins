@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AugTwins Debug Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">AugTwins Debug Interface</h1>
+            <p class="status">Connected to backend. Current agent: <span id="currentAgent">lars</span></p>
+        </header>
+        
+        <div class="controls">
+            <div class="agent-selector">
+                <label for="agentSelect">Select Agent:</label>
+                <select id="agentSelect" class="select-dropdown">
+                    <option value="lars">Lars</option>
+                </select>
+                <button onclick="switchAgent()" class="btn btn-secondary">Switch</button>
+                <button onclick="saveConversation()" class="btn btn-primary">Save History</button>
+            </div>
+        </div>
+        
+        <div id="chatContainer" class="chat-container">
+            <div class="chat-placeholder">
+                <div class="placeholder-icon">💬</div>
+                <p>Start a conversation with your AI agent</p>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="messageInput" class="message-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" class="btn btn-send">
+                <span class="send-icon">→</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
