@@ -186,8 +186,7 @@ class Lars(ProfileAgent):
 
     def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
         """Generate response using Lars' specific style and Mem0 memories."""
-        # Ensure memories are loaded on first conversation
-        self._ensure_memories_loaded()
+        # Memories are loaded during app startup, no need for lazy loading
         
         # Retrieve relevant memories (this will use Mem0 if available)
         relevant_memories = "\n".join(self.retrieve_memories(user_msg))

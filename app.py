@@ -23,8 +23,10 @@ conversation_history = []
 
 def load_agent(agent) -> None:
     """Load agent - memories are now handled by individual agents"""
-    # Agent handles its own memory loading (Mem0 + local fallback)
-    pass
+    # Force memory loading during startup to avoid first-response latency
+    if hasattr(agent, '_ensure_memories_loaded'):
+        print(f"[{agent.name}] Loading memories during startup...")
+        agent._ensure_memories_loaded()
 
 
 def save_conversation_history(agent, conversations: list) -> None:
