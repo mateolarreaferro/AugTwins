@@ -1,15 +1,16 @@
 """Digital-Twin agent: episodic memory, retrieval, LLM chat, optional TTS."""
 from __future__ import annotations
-
-import os
+import json
 import time
+import os
 from dataclasses import dataclass, field
-from typing import Dict, List, Sequence, Set
+from typing import List, Dict, Set, Sequence
 
 try:
     import requests
-except ModuleNotFoundError:  # optional for offline tests
+except ModuleNotFoundError:  # allow tests without requests
     requests = None
+
 try:
     from sentence_transformers import SentenceTransformer, util
 except ModuleNotFoundError:  # graceful fallback if dependency missing
@@ -29,24 +30,12 @@ except ModuleNotFoundError:  # graceful fallback if dependency missing
 from . import memory_utils as mu
 from . import utterance_utils
 
-# Mem0 key for remote memory operations
-try:
-    from settings import MEM0_API_KEY as _MEM0_KEY
-except (ModuleNotFoundError, ImportError):
-    _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
+# API keys - load from centralized config
+from config import MEM0_API_KEY, ELEVEN_API_KEY
 
-if _MEM0_KEY and requests is None:
+if MEM0_API_KEY and requests is None:
     print("[Mem0 disabled] install 'requests' to enable remote features")
 
-
-# ElevenLabs key (settings.py → env fallback)
-try:
-    from settings import ELEVEN_API_KEY as _ELEVEN_KEY
-except (ModuleNotFoundError, ImportError):
-    try:
-        from settings import ELEVENLABS_API_KEY as _ELEVEN_KEY
-    except (ModuleNotFoundError, ImportError):
-        _ELEVEN_KEY = os.getenv("ELEVEN_API_KEY", "") or os.getenv("ELEVENLABS_API_KEY", "")
 
 # Shared embedder
 _EMBEDDER = SentenceTransformer("all-MiniLM-L6-v2")

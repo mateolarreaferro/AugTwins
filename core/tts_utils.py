@@ -12,14 +12,8 @@ except ModuleNotFoundError:  # allow tests without requests
 from uuid import uuid4
 from typing import Optional
 
-# key import or env fallback 
-try:
-    from settings import ELEVEN_API_KEY as _ELEVEN_KEY
-except (ModuleNotFoundError, ImportError):
-    try:
-        from settings import ELEVENLABS_API_KEY as _ELEVEN_KEY
-    except (ModuleNotFoundError, ImportError):
-        _ELEVEN_KEY = os.getenv("ELEVEN_API_KEY", "") or os.getenv("ELEVENLABS_API_KEY", "")
+# API key - load from centralized config
+from config import ELEVEN_API_KEY
 
 
 # main helper
@@ -28,12 +22,12 @@ def speak(text: str, voice_id: str, *, playback_cmd: str = "afplay") -> None:
     Download TTS audio from ElevenLabs and play it via *playback_cmd*.
     No-ops if keys or voice_id are missing.
     """
-    if not _ELEVEN_KEY or not voice_id or not requests:
+    if not ELEVEN_API_KEY or not voice_id or not requests:
         print("[TTS disabled – set ELEVEN_API_KEY / ELEVENLABS_API_KEY and voice ID]")
         return
 
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
-    headers = {"xi-api-key": _ELEVEN_KEY, "Content-Type": "application/json"}
+    headers = {"xi-api-key": ELEVEN_API_KEY, "Content-Type": "application/json"}
     body = {"text": text,
             "voice_settings": {"stability": 0.55, "similarity_boost": 0.8}}
 

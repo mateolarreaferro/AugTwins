@@ -240,15 +240,11 @@ def trim_to_token_limit(text: str, max_tokens: int) -> str:
 
 
 def build_openai_client() -> OpenAI:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        try:
-            from settings import OPENAI_API_KEY
-            api_key = OPENAI_API_KEY
-        except ImportError:
-            logging.critical("OPENAI_API_KEY not set (env or .env) and settings.py not found")
-            sys.exit(1)
-    return OpenAI(api_key=api_key)
+    from config import OPENAI_API_KEY
+    if not OPENAI_API_KEY:
+        logging.critical("OPENAI_API_KEY not set. Please add it to your .env file.")
+        sys.exit(1)
+    return OpenAI(api_key=OPENAI_API_KEY)
 
 
 def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utterance: Dict[str, Any], user_id: str) -> bool:
@@ -259,10 +255,9 @@ def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utte
     
     try:
         # Get Mem0 Pro credentials
-        try:
-            from settings import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
-        except ImportError:
-            logging.warning("Mem0 Pro credentials not found in settings - skipping memory upload")
+        from config import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
+        if not all([MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID]):
+            logging.warning("Mem0 Pro credentials not found in config - skipping memory upload")
             return False
         
         # Initialize Mem0 Pro client
@@ -375,10 +370,9 @@ def verify_mem0_data(user_id: str) -> None:
     
     try:
         # Get Mem0 Pro credentials
-        try:
-            from settings import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
-        except ImportError:
-            logging.error("Mem0 Pro credentials not found in settings")
+        from config import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
+        if not all([MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID]):
+            logging.error("Mem0 Pro credentials not found in config - cannot verify")
             return
         
         # Initialize Mem0 Pro client

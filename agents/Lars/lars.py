@@ -156,7 +156,10 @@ class Lars(ProfileAgent):
         """Get or create Mem0 client."""
         if self._mem0_client is None and MEM0_AVAILABLE:
             try:
-                from settings import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
+                from config import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
+                if not all([MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID]):
+                    print("[Lars] Mem0 credentials not found in config")
+                    return None
                 self._mem0_client = MemoryClient(
                     api_key=MEM0_API_KEY,
                     org_id=MEM0_ORG_ID,

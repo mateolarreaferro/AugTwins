@@ -5,31 +5,28 @@ This version avoids circular-import problems by:
   • Importing Memory lazily inside load_memories()
 """
 from __future__ import annotations
-
 import json
-import os
 from pathlib import Path
-from typing import List, TYPE_CHECKING
+import time
+from typing import List, Dict, Any, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.agent import Agent
 
 try:
     import requests
-except ModuleNotFoundError:  # allow tests without requests installed
+except ModuleNotFoundError:  # allow tests without requests
     requests = None
 
-from . import llm_utils
+# Mem0 API key - load from centralized config
+from config import MEM0_API_KEY
 
 # Optional forward references for static type checkers only
 if TYPE_CHECKING:          # <- evaluated by tools like mypy, ignored at runtime
     from .agent import Agent, Memory
 
-# Mem0 API key lookup
-try:
-    from settings import MEM0_API_KEY as _MEM0_KEY
-except (ModuleNotFoundError, ImportError):
-    _MEM0_KEY = os.getenv("MEM0_API_KEY", "")
-
-if _MEM0_KEY and requests is None:
-    print("[Mem0 disabled] install 'requests' to enable remote persistence")
+if MEM0_API_KEY and requests is None:
+    print("[Mem0 disabled] install 'requests' to enable remote features")
 
 _BASE_URL = "https://api.mem0.ai/v1"
 
@@ -39,7 +36,7 @@ _DIR.mkdir(exist_ok=True)
 
 
 def _use_remote() -> bool:
-    return bool(_MEM0_KEY and requests)
+    return bool(MEM0_API_KEY and requests)
 
 
 def _path(name: str) -> Path:
@@ -56,7 +53,7 @@ def _remote_url(name: str) -> str:
 def save_memories(agent: "Agent") -> None:  # quotes avoid runtime eval
     data = [m.__dict__ for m in agent.memory]
     if _use_remote():
-        headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
+        headers = {"Authorization": f"Bearer {MEM0_API_KEY}", "Content-Type": "application/json"}
         try:
             r = requests.post(_remote_url(agent.name), json=data, headers=headers, timeout=30)
             r.raise_for_status()
@@ -80,7 +77,7 @@ def load_memories(name: str) -> List["Memory"]:
     from .agent import Memory   # deferred import – safe now
     data = []
     if _use_remote():
-        headers = {"Authorization": f"Bearer {_MEM0_KEY}"}
+        headers = {"Authorization": f"Bearer {MEM0_API_KEY}"}
         try:
             r = requests.get(_remote_url(name), headers=headers, timeout=30)
             r.raise_for_status()
@@ -106,7 +103,7 @@ def llm_summarise_block(
     model: str = "gpt-4o-mini",
 ) -> str:
     if _use_remote():
-        headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
+        headers = {"Authorization": f"Bearer {MEM0_API_KEY}", "Content-Type": "application/json"}
         payload = {"text": block, "agent": agent_name}
         try:
             r = requests.post(f"{_BASE_URL}/summarize", json=payload, headers=headers, timeout=30)

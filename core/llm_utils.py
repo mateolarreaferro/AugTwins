@@ -11,14 +11,11 @@ try:
 except ModuleNotFoundError:  # allow tests without openai installed
     OpenAI = None
 
-# API key
-try:
-    from settings import OPENAI_API_KEY as _OPENAI_KEY
-except (ModuleNotFoundError, ImportError):
-    _OPENAI_KEY = os.getenv("OPENAI_API_KEY", "")
+# API key - load from centralized config
+from config import OPENAI_API_KEY
 
 if OpenAI:
-    client = OpenAI(api_key=_OPENAI_KEY)
+    client = OpenAI(api_key=OPENAI_API_KEY)
 else:
     client = None
 
