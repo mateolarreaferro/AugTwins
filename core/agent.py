@@ -140,19 +140,6 @@ class Agent:
         self.memory.append(mem)
         self._update_graph(text)
         self._maybe_sync()
-        # Disabled old Mem0 REST API - now using Mem0 Pro client in individual agents
-        # if _MEM0_KEY and requests:
-        #     headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
-        #     payload = mem.__dict__ | {"agent": self.name}
-        #     try:
-        #         requests.post(
-        #             "https://api.mem0.ai/v1/memory",
-        #             json=payload,
-        #             headers=headers,
-        #             timeout=30,
-        #         )
-        #     except Exception as e:
-        #         print("[Mem0 save error]", e)
         self._auto_rollup()
 
     def _auto_rollup(self) -> None:
@@ -168,22 +155,6 @@ class Agent:
     # Retrieval
     def retrieve_memories(self, query: str, top_k: int = 5) -> List[str]:
         results: List[str] = []
-        # Disabled old Mem0 REST API - individual agents handle their own Mem0 integration
-        # if _MEM0_KEY and requests:
-        #     headers = {"Authorization": f"Bearer {_MEM0_KEY}", "Content-Type": "application/json"}
-        #     payload = {"query": query, "k": top_k, "agent": self.name}
-        #     try:
-        #         r = requests.post(
-        #             "https://api.mem0.ai/v1/search", json=payload, headers=headers, timeout=30
-        #         )
-        #         r.raise_for_status()
-        #         results = r.json().get("results", [])
-        #     except Exception as e:
-        #         if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
-        #             print("[Mem0 search error] remote search not found; using local memories")
-        #         else:
-        #             print("[Mem0 search error]", e)
-
         local_results: List[str] = []
         if self.memory:
             self._ensure_embeddings(self.memory)
