@@ -19,7 +19,7 @@ except ModuleNotFoundError:  # allow tests without requests
     requests = None
 
 # Mem0 API key - load from centralized config
-from config import MEM0_API_KEY
+from config import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
 
 # Optional forward references for static type checkers only
 if TYPE_CHECKING:          # <- evaluated by tools like mypy, ignored at runtime
@@ -36,7 +36,7 @@ _DIR.mkdir(exist_ok=True)
 
 
 def _use_remote() -> bool:
-    return bool(MEM0_API_KEY and requests)
+    return bool(MEM0_API_KEY and MEM0_ORG_ID and MEM0_PROJECT_ID and requests)
 
 
 def _path(name: str) -> Path:
@@ -46,25 +46,24 @@ def _path(name: str) -> Path:
 
 def _remote_url(name: str) -> str:
     """Return the Mem0 API URL for *name*'s memories."""
-    return f"{_BASE_URL}/agents/{name.lower()}/memories"
+    return f"{_BASE_URL}/memories"
+
+def _remote_headers() -> Dict[str, str]:
+    """Return the headers for Mem0 API requests."""
+    return {
+        "Authorization": f"Bearer {MEM0_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
 
 # save / load
 def save_memories(agent: "Agent") -> None:  # quotes avoid runtime eval
-    data = [m.__dict__ for m in agent.memory]
     if _use_remote():
-        headers = {"Authorization": f"Bearer {MEM0_API_KEY}", "Content-Type": "application/json"}
-        try:
-            r = requests.post(_remote_url(agent.name), json=data, headers=headers, timeout=30)
-            r.raise_for_status()
-        except Exception as e:
-            if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
-                print("[Mem0 save error] remote agent not found; using local file")
-            else:
-                print("[Mem0 save error]", e)
-            with _path(agent.name).open("w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+        # For Mem0 Pro, we don't bulk save - memories are added individually via add_memory
+        # This function is kept for backward compatibility
+        return
     else:
+        data = [m.__dict__ for m in agent.memory]
         with _path(agent.name).open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
@@ -77,16 +76,32 @@ def load_memories(name: str) -> List["Memory"]:
     from .agent import Memory   # deferred import – safe now
     data = []
     if _use_remote():
-        headers = {"Authorization": f"Bearer {MEM0_API_KEY}"}
         try:
-            r = requests.get(_remote_url(name), headers=headers, timeout=30)
+            # Get memories from Mem0 Pro
+            params = {"user_id": name.lower()}
+            if MEM0_ORG_ID:
+                params["org_id"] = MEM0_ORG_ID
+            if MEM0_PROJECT_ID:
+                params["project_id"] = MEM0_PROJECT_ID
+            
+            r = requests.get(_remote_url(name), headers=_remote_headers(), params=params, timeout=30)
             r.raise_for_status()
-            data = r.json()
+            response_data = r.json()
+            
+            # Extract memories from response
+            memories = response_data.get("memories", [])
+            data = []
+            for mem in memories:
+                # Convert Mem0 Pro format to our Memory format
+                data.append({
+                    "text": mem.get("text", ""),
+                    "timestamp": mem.get("created_at", time.time()),
+                    "embedding": [],  # Embeddings are handled by Mem0 Pro
+                    "is_summary": False
+                })
         except Exception as e:
-            if getattr(e, "response", None) and getattr(e.response, "status_code", None) == 404:
-                print("[Mem0 load error] remote memories not found; falling back to local")
-            else:
-                print("[Mem0 load error]", e)
+            print(f"[Mem0 load error] {e}")
+    
     if not data:
         p = _path(name)
         if p.exists():

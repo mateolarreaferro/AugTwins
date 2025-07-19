@@ -153,18 +153,25 @@ class Lars(ProfileAgent):
         return results
 
     def _get_mem0_client(self):
-        """Get or create Mem0 client."""
+        """Get or create Mem0 client with graph memory enabled."""
         if self._mem0_client is None and MEM0_AVAILABLE:
             try:
                 from config import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
                 if not all([MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID]):
                     print("[Lars] Mem0 credentials not found in config")
                     return None
+                
+                # Initialize Mem0 Pro client
                 self._mem0_client = MemoryClient(
                     api_key=MEM0_API_KEY,
                     org_id=MEM0_ORG_ID,
                     project_id=MEM0_PROJECT_ID
                 )
+                
+                # Check if graph memory is enabled
+                project_info = self._mem0_client.get_project()
+                graph_enabled = project_info.get('enable_graph', False)
+                print(f"[Lars] Mem0 client initialized (graph memory: {'enabled' if graph_enabled else 'disabled'})")
             except ImportError:
                 print("[Lars] Mem0 credentials not found")
             except Exception as e:
@@ -210,12 +217,42 @@ class Lars(ProfileAgent):
             relevant=relevant_memories,
             graph_info=graph_info,
             model=model,
-            temperature=0.7,  # Slightly higher temperature for more personality
+            temperature=0.8,
         )
         
         # Note: We don't automatically store conversations in memory anymore
         # The user will be asked at the end of the chat if they want to save to Mem0
         return response
+    
+    def add_memory_to_mem0(self, text: str, metadata: dict = None) -> bool:
+        """Add memory to Mem0 Pro with graph relationships enabled."""
+        client = self._get_mem0_client()
+        if not client:
+            return False
+        
+        try:
+            # Format as message list for Mem0 Pro API
+            messages = [{"role": "user", "content": text}]
+            result = client.add(messages, user_id="lars", metadata=metadata)
+            print(f"[Lars] Added memory to Mem0 Pro: {result}")
+            return True
+        except Exception as e:
+            print(f"[Lars] Error adding memory to Mem0 Pro: {e}")
+            return False
+    
+    def get_memory_graph(self) -> dict:
+        """Get the memory graph for Lars from Mem0 Pro."""
+        client = self._get_mem0_client()
+        if not client:
+            return {}
+        
+        try:
+            # Note: Graph relationships are automatically created by Mem0 Pro
+            print("[Lars] Graph relationships are managed by Mem0 Pro dashboard")
+            return {"status": "Graph relationships available in Mem0 Pro dashboard"}
+        except Exception as e:
+            print(f"[Lars] Error getting memory graph: {e}")
+            return {}
 
     def reflect_on_conversation(self, conversation_history: list, model: str = "gpt-4o-mini") -> str:
         """Generate reflection on conversation and extract new learnings."""
