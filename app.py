@@ -1,4 +1,8 @@
 """Flask web application for AugTwins - connects backend with Unreal Engine."""
+import os
+# Set tokenizers environment variable before any imports that might use it
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+
 import json
 from datetime import datetime
 from pathlib import Path

@@ -10,17 +10,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Required API keys
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-ELEVEN_API_KEY = os.getenv("ELEVEN_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+ELEVEN_API_KEY = os.getenv("ELEVEN_API_KEY", "").strip()
 
 # Optional API keys (for advanced features)
-MEM0_API_KEY = os.getenv("MEM0_API_KEY")
-MEM0_ORG_ID = os.getenv("MEM0_ORG_ID")
-MEM0_PROJECT_ID = os.getenv("MEM0_PROJECT_ID")
+MEM0_API_KEY = os.getenv("MEM0_API_KEY", "").strip()
+MEM0_ORG_ID = os.getenv("MEM0_ORG_ID", "").strip()
+MEM0_PROJECT_ID = os.getenv("MEM0_PROJECT_ID", "").strip()
 
 # Legacy support for alternative environment variable names
 if not ELEVEN_API_KEY:
-    ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+    ELEVEN_API_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
 
 def validate_required_keys():
     """Validate that required API keys are set."""

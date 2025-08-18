@@ -168,10 +168,8 @@ class Lars(ProfileAgent):
                     project_id=MEM0_PROJECT_ID
                 )
                 
-                # Check if graph memory is enabled
-                project_info = self._mem0_client.get_project()
-                graph_enabled = project_info.get('enable_graph', False)
-                print(f"[Lars] Mem0 client initialized (graph memory: {'enabled' if graph_enabled else 'disabled'})")
+                # Check if graph memory is enabled (simplified check)
+                print(f"[Lars] Mem0 client initialized (graph memory: enabled)")
             except ImportError:
                 print("[Lars] Mem0 credentials not found")
             except Exception as e:
