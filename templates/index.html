@@ -23,6 +23,13 @@
                 <button onclick="switchAgent()" class="btn btn-secondary">Switch</button>
                 <button onclick="saveConversation()" class="btn btn-primary">Save History</button>
             </div>
+            <div class="mode-selector">
+                <label for="modeSelect">Response Mode:</label>
+                <select id="modeSelect" class="select-dropdown">
+                    <option value="conversation">Conversation (Brief)</option>
+                    <option value="storytelling">Storytelling (Detailed)</option>
+                </select>
+            </div>
         </div>
         
         <div id="chatContainer" class="chat-container">

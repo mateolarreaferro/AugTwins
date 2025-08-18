@@ -131,13 +131,14 @@ def chat():
     
     data = request.get_json()
     message = data.get('message', '').strip()
+    mode = data.get('mode', 'conversation')  # Default to conversation mode
     
     if not message:
         return jsonify({'error': 'No message provided'}), 400
     
     try:
-        # Generate response
-        reply = current_agent.generate_response(message)
+        # Generate response with mode
+        reply = current_agent.generate_response(message, mode=mode)
         
         # Add to conversation history
         conversation_entry = {

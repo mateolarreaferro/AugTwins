@@ -99,10 +99,14 @@ class ChatInterface {
         this.showTypingIndicator();
         
         try {
+            const mode = document.getElementById('modeSelect').value;
             const response = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ 
+                    message: message,
+                    mode: mode 
+                })
             });
             
             const data = await response.json();

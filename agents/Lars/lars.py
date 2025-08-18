@@ -192,7 +192,7 @@ class Lars(ProfileAgent):
                 print(f"[Lars] Error loading memories: {e}")
                 self._memories_loaded = True  # Don't keep trying
 
-    def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
+    def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini", mode: str = "conversation") -> str:
         """Generate response using Lars' specific style and Mem0 memories."""
         # Memories are loaded during app startup, no need for lazy loading
         
@@ -216,6 +216,7 @@ class Lars(ProfileAgent):
             graph_info=graph_info,
             model=model,
             temperature=0.8,
+            mode=mode,
         )
         
         # Note: We don't automatically store conversations in memory anymore

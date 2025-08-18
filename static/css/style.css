@@ -62,9 +62,12 @@ body {
 /* Controls */
 .controls {
     margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.agent-selector {
+.agent-selector, .mode-selector {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 12px;
@@ -75,9 +78,11 @@ body {
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    flex: 1;
+    min-width: 250px;
 }
 
-.agent-selector label {
+.agent-selector label, .mode-selector label {
     font-weight: 500;
     color: #4a5568;
     white-space: nowrap;

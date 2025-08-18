@@ -111,6 +111,7 @@ def generate_utterance(
     graph_info: str,
     model: str = "gpt-4o-mini",
     temperature: float = 0.5,
+    mode: str = "conversation",
 ) -> str:
     """Generate a reply in the style of *agent_name*, referencing transcripts."""
     transcript = load_transcript(agent_name)
@@ -118,14 +119,24 @@ def generate_utterance(
     # Check for fixation patterns in recent memories
     fixation_context = _detect_fixation_patterns(relevant, agent_name)
     
-    prompt = (
-        f"You are {agent_name}. Personality: {personality}\n"
-        "Speak naturally and conversationally. Keep responses concise and flowing. "
-        "Use fragments, statements, and natural pauses. Avoid ending every response with questions. "
-        "When you do ask questions, make them feel organic to the conversation. "
-        "Don't fixate on single topics - let conversations evolve naturally. "
-        "Respond like you would in a casual chat with a friend.\n"
-    )
+    if mode == "conversation":
+        prompt = (
+            f"You are {agent_name}. Personality: {personality}\n"
+            "IMPORTANT: Keep responses very brief - maximum 1-3 sentences. Be conversational but concise. "
+            "Speak naturally like a friend texting back. Use short statements, not long explanations. "
+            "Avoid ending every response with questions unless it's truly necessary. "
+            "Don't fixate on single topics - let conversations evolve naturally. "
+            "Think of this as a quick back-and-forth chat, not a formal conversation.\n"
+        )
+    else:  # storytelling mode
+        prompt = (
+            f"You are {agent_name}. Personality: {personality}\n"
+            "Speak naturally and expressively. You can be detailed and elaborate when telling stories or explaining things. "
+            "Use rich descriptions, engaging narratives, and full explanations. "
+            "Feel free to ask follow-up questions when appropriate. "
+            "Don't fixate on single topics - let conversations evolve naturally. "
+            "Respond with the depth and detail that the conversation warrants.\n"
+        )
     
     if fixation_context:
         # Provide specific guidance based on fixation type
