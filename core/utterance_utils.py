@@ -9,6 +9,7 @@ from typing import Optional
 import json
 
 from . import llm_utils
+from router import pick_model
 
 _TRANS_DIR = Path("transcripts")
 
@@ -157,10 +158,12 @@ def generate_utterance(
         f"Graph context: {graph_info}\n\n"
         f"User: {user_msg}\n{agent_name}:"
     )
+    cfg = pick_model(mode)
     answer = llm_utils.chat(
         [{"role": "system", "content": prompt}],
-        model=model,
+        model=cfg["model"],
         temperature=temperature,
+        max_tokens=cfg["max_tokens"],
     )
     cleaned = answer.lstrip()
     prefix = f"{agent_name}:"
