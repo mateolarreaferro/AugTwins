@@ -194,10 +194,22 @@ class Lars(ProfileAgent):
 
     def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini", mode: str = "conversation") -> str:
         """Generate response using Lars' specific style and Mem0 memories."""
-        # Memories are loaded during app startup, no need for lazy loading
+        # Add user message to conversation context
+        self.add_to_context("user", user_msg)
+        
+        # Get conversation context
+        context_string = self.get_context_string()
         
         # Retrieve relevant memories (this will use Mem0 if available)
-        relevant_memories = "\n".join(self.retrieve_memories(user_msg))
+        retrieved_memories = "\n".join(self.retrieve_memories(user_msg))
+        
+        # Combine context with retrieved memories, prioritizing recent context
+        if context_string and retrieved_memories:
+            relevant = f"Recent conversation:\n{context_string}\n\nRelevant memories:\n{retrieved_memories}"
+        elif context_string:
+            relevant = f"Recent conversation:\n{context_string}"
+        else:
+            relevant = retrieved_memories
         
         # Get graph context
         graph_info = ", ".join(self.graph_context(user_msg))
@@ -212,12 +224,15 @@ class Lars(ProfileAgent):
             agent_name=self.name,
             personality=enhanced_personality,
             user_msg=user_msg,
-            relevant=relevant_memories,
+            relevant=relevant,
             graph_info=graph_info,
             model=model,
             temperature=0.8,
             mode=mode,
         )
+        
+        # Add response to conversation context
+        self.add_to_context("agent", response)
         
         # Note: We don't automatically store conversations in memory anymore
         # The user will be asked at the end of the chat if they want to save to Mem0

@@ -56,6 +56,8 @@ class Agent:
     tts_voice_id: str
     memory: List[Memory] = field(default_factory=list)
     graph: Dict[str, Set[str]] = field(default_factory=dict)
+    conversation_context: List[Dict[str, str]] = field(default_factory=list)
+    max_context_turns: int = 10
     _sync_every: int = 5
     _unsynced_count: int = 0
 
@@ -74,6 +76,26 @@ class Agent:
         if len(self.memory) > limit:
             self.memory = self.memory[-limit:]
             self.sync_memories()
+    
+    def add_to_context(self, role: str, message: str) -> None:
+        """Add a message to the conversation context."""
+        self.conversation_context.append({"role": role, "message": message})
+        if len(self.conversation_context) > self.max_context_turns * 2:
+            self.conversation_context = self.conversation_context[-(self.max_context_turns * 2):]
+    
+    def get_context_string(self) -> str:
+        """Get the current conversation context as a formatted string."""
+        if not self.conversation_context:
+            return ""
+        context_lines = []
+        for turn in self.conversation_context:
+            role = "User" if turn["role"] == "user" else self.name
+            context_lines.append(f"{role}: {turn['message']}")
+        return "\n".join(context_lines)
+    
+    def clear_context(self) -> None:
+        """Clear the conversation context."""
+        self.conversation_context = []
 
     # ── Embedding helpers
     def _ensure_embeddings(self, mems: Sequence[Memory]) -> None:
@@ -173,8 +195,22 @@ class Agent:
         return merged
 
     # LLM response
-    def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini") -> str:
-        relevant = "\n".join(self.retrieve_memories(user_msg))
+    def generate_response(self, user_msg: str, *, model: str = "gpt-4o-mini", mode: str = "conversation") -> str:
+        # Add user message to context
+        self.add_to_context("user", user_msg)
+        
+        # Get conversation context and combine with retrieved memories
+        context_string = self.get_context_string()
+        retrieved_memories = "\n".join(self.retrieve_memories(user_msg))
+        
+        # Combine context with retrieved memories, prioritizing recent context
+        if context_string and retrieved_memories:
+            relevant = f"Recent conversation:\n{context_string}\n\nRelevant memories:\n{retrieved_memories}"
+        elif context_string:
+            relevant = f"Recent conversation:\n{context_string}"
+        else:
+            relevant = retrieved_memories
+        
         graph_info = ", ".join(self.graph_context(user_msg))
         response = utterance_utils.generate_utterance(
             agent_name=self.name,
@@ -184,7 +220,13 @@ class Agent:
             graph_info=graph_info,
             model=model,
             temperature=0.5,
+            mode=mode,
         )
+        
+        # Add response to context
+        self.add_to_context("agent", response)
+        
+        # Store in long-term memory
         self.add_memory(f"User: {user_msg}\n{self.name}: {response}")
         return response
 

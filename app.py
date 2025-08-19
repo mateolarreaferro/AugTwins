@@ -182,6 +182,9 @@ def switch_agent():
         save_conversation_history(current_agent, conversation_history)
         conversation_history = []
     
+    # Clear conversation context for the current agent
+    current_agent.clear_context()
+    
     # Switch agent
     current_agent = AGENTS[agent_name]
     load_agent(current_agent)
@@ -203,6 +206,20 @@ def save_conversation():
         save_conversation_history(current_agent, conversation_history)
         conversation_history = []
         return jsonify({'message': 'Conversation history saved successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/clear-context', methods=['POST'])
+def clear_context():
+    """Clear the current agent's conversation context."""
+    global current_agent
+    
+    try:
+        current_agent.clear_context()
+        return jsonify({
+            'message': 'Conversation context cleared',
+            'agent': current_agent.name
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
