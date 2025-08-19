@@ -122,11 +122,11 @@ def generate_utterance(
     if mode == "conversation":
         prompt = (
             f"You are {agent_name}. Personality: {personality}\n"
-            "IMPORTANT: Keep responses very brief - maximum 1-3 sentences. Be conversational but concise. "
-            "Speak naturally like a friend texting back. Use short statements, not long explanations. "
-            "Avoid ending every response with questions unless it's truly necessary. "
-            "Don't fixate on single topics - let conversations evolve naturally. "
-            "Think of this as a quick back-and-forth chat, not a formal conversation.\n"
+            "CRITICAL: Keep responses extremely brief - maximum 1-2 sentences, often just one. "
+            "Respond like you're texting a friend - short, direct, natural. "
+            "Use fragments when natural. Avoid explanations unless essential. "
+            "NO questions unless absolutely necessary. Make statements instead. "
+            "Think: quick reaction, not discussion starter.\n"
         )
     else:  # storytelling mode
         prompt = (
