@@ -4,10 +4,14 @@ import os
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 import json
+import asyncio
+import base64
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
+from threading import Thread
 
 # Agents
 from agents.Lars.lars import lars
@@ -16,13 +20,16 @@ AGENTS = {
     "lars": lars,
 }
 
-# Initialize Flask app
+# Initialize Flask app with SocketIO
 app = Flask(__name__)
 CORS(app)  # Enable CORS for Unreal Engine integration
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Global state
 current_agent = lars
 conversation_history = []
+tts_manager = None  # Will be initialized when needed
+active_tts_jobs = {}  # Track active TTS streaming jobs
 
 
 def load_agent(agent) -> None:
@@ -240,12 +247,108 @@ def health_check():
         'timestamp': datetime.now().isoformat()
     })
 
+# WebSocket handlers for real-time TTS streaming
+@socketio.on('connect')
+def handle_connect():
+    """Handle WebSocket connection."""
+    print(f"[WebSocket] Client connected: {request.sid}")
+    emit('connected', {'status': 'connected', 'sid': request.sid})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Handle WebSocket disconnection."""
+    print(f"[WebSocket] Client disconnected: {request.sid}")
+    # Cancel any active TTS jobs for this client
+    if request.sid in active_tts_jobs:
+        job_id = active_tts_jobs[request.sid]
+        asyncio.run(cancel_tts_stream(job_id))
+        del active_tts_jobs[request.sid]
+
+@socketio.on('prompt')
+def handle_prompt(data):
+    """Handle text prompt for TTS streaming."""
+    global current_agent, tts_manager
+    
+    text = data.get('text', '').strip()
+    if not text:
+        emit('error', {'error': 'No text provided'})
+        return
+    
+    # Initialize TTS manager if needed
+    if tts_manager is None:
+        from core.tts_utils import get_tts_manager
+        tts_manager = get_tts_manager()
+    
+    # Get agent's voice ID from tts_voice_id attribute
+    voice_id = getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')  # Default to Rachel
+    
+    # Start streaming in a background thread
+    job_id = data.get('id', str(uuid4()))
+    active_tts_jobs[request.sid] = job_id
+    
+    def stream_audio():
+        """Stream audio in background thread."""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        async def _stream():
+            try:
+                async for packet in tts_manager.stream_tts(text, voice_id, job_id):
+                    if packet['type'] == 'audio_start':
+                        # Send JSON metadata
+                        socketio.emit('audio_start', {
+                            'id': packet['id'],
+                            'encoding': packet['encoding'],
+                            'sample_rate': packet['sample_rate'],
+                            'channels': packet['channels']
+                        }, room=request.sid)
+                    elif packet['type'] == 'audio_data':
+                        # Send binary PCM data directly (not base64 encoded)
+                        socketio.emit('audio_data', packet['data'], room=request.sid)
+                    elif packet['type'] == 'audio_end':
+                        # Send end signal
+                        socketio.emit('audio_end', {'id': packet['id']}, room=request.sid)
+            except Exception as e:
+                socketio.emit('error', {'error': str(e)}, room=request.sid)
+            finally:
+                if request.sid in active_tts_jobs:
+                    del active_tts_jobs[request.sid]
+        
+        loop.run_until_complete(_stream())
+        loop.close()
+    
+    thread = Thread(target=stream_audio)
+    thread.daemon = True
+    thread.start()
+
+@socketio.on('cancel')
+def handle_cancel(data):
+    """Handle cancellation of TTS streaming."""
+    global tts_manager
+    
+    job_id = data.get('id')
+    if not job_id and request.sid in active_tts_jobs:
+        job_id = active_tts_jobs[request.sid]
+    
+    if job_id and tts_manager:
+        asyncio.run(cancel_tts_stream(job_id))
+        emit('cancelled', {'id': job_id})
+
+async def cancel_tts_stream(job_id: str):
+    """Cancel a TTS streaming job."""
+    global tts_manager
+    if tts_manager:
+        await tts_manager.cancel_job(job_id)
+
 if __name__ == "__main__":
+    from uuid import uuid4
+    
     # Initialize the default agent
     load_agent(current_agent)
     print(f"AugTwins Flask server starting with agent: {current_agent.name}")
     print("Debug interface available at: http://localhost:5000")
     print("API endpoints available for Unreal Engine integration")
+    print("WebSocket support enabled for real-time TTS streaming")
     
-    # Run Flask app
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Run Flask app with SocketIO
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
