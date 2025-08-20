@@ -1,0 +1,241 @@
+Interview Memories:   0%|          | 0/3 [00:00<?, ?it/s]INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Interview Memories:  33%|███▎      | 1/3 [00:12<00:24, 12.47s/it]INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Interview Memories:  67%|██████▋   | 2/3 [00:25<00:12, 12.69s/it]INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Interview Memories: 100%|██████████| 3/3 [00:33<00:00, 10.54s/it]Interview Memories: 100%|██████████| 3/3 [00:33<00:00, 11.10s/it]
+INFO | Processing digital footprint from /Users/mateolarreaferro/Desktop/AugTwins - Main/AugTwins/digital footprint/lars
+INFO | Processing profile: Profile.json
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing settings: Settings.json
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing extensions: Extensions.json
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing browsing: History.json
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing academic: New Media Art_ An Overview
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing academic: Critical Thinking_ What Every Person Needs
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing academic: Passing for White, Passing for Black
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing academic: Art in the Age of Mechanical Reproduction
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing academic: Butler_ Performative Acts and Gender Constitution
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing search: MyActivity.html
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing youtube: MyActivity.html
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing location: MyActivity.html
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing bookmarks: Bookmarks.html
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing preferences: Default list.csv
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing preferences: Favorite jobs.csv
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing preferences: Favorite images.csv
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing preferences: Want to go.csv
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing preferences: Favorite places.csv
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing places: Labeled places.json
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Processing reviews: Reviews.json
+INFO | Processing timeline: Settings.json
+INFO | Extracted 86 memories from digital footprint
+INFO | Total memories: 159 (interviews: 73, footprint: 86)
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO | Memories written → /Users/mateolarreaferro/Desktop/AugTwins - Main/AugTwins/agents/Lars/memories.json
+INFO | Persona written → /Users/mateolarreaferro/Desktop/AugTwins - Main/AugTwins/agents/Lars/persona.json
+INFO | Utterance guide written → /Users/mateolarreaferro/Desktop/AugTwins - Main/AugTwins/agents/Lars/utterance.json
+INFO | Uploading profile to Mem0 for user: lars
+INFO | HTTP Request: GET https://api.mem0.ai/v1/ping/?org_id=org_ixqbag8SKEDNFcDbFNnWjejr8O0RvU1DaNWcbcIR&project_id=proj_nX4nyRFzNLDR0jcxvRUVZEK5jPQny1mBPJ9HYW6d "HTTP/1.1 200 OK"
+INFO | Starting Mem0 upload for user 'lars'...
+/Users/mateolarreaferro/miniconda3/lib/python3.12/site-packages/mem0/client/main.py:34: DeprecationWarning: output_format='v1.0' is deprecated therefore setting it to 'v1.1' by default. Check out the docs for more information: https://docs.mem0.ai/platform/quickstart#4-1-create-memories
+  return func(*args, **kwargs)
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 20/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 40/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 60/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 80/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 100/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 120/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | 📊 Progress: 140/159 memories uploaded
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | Uploaded 159/159 memories to Mem0
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | ✅ Uploaded persona to Mem0
+INFO | HTTP Request: POST https://api.mem0.ai/v1/memories/ "HTTP/1.1 200 OK"
+INFO | ✅ Uploaded communication style to Mem0
+INFO | HTTP Request: GET https://api.mem0.ai/v1/memories/?user_id=lars&org_id=org_ixqbag8SKEDNFcDbFNnWjejr8O0RvU1DaNWcbcIR&project_id=proj_nX4nyRFzNLDR0jcxvRUVZEK5jPQny1mBPJ9HYW6d "HTTP/1.1 200 OK"
+INFO | 🔍 Verification: Found 148 total memories for user 'lars' in Mem0
+INFO | 📊 Memory breakdown for 'lars':
+INFO |   - communication_style: 7 memories
+INFO |   - persona: 13 memories
+INFO |   - preference: 65 memories
+INFO |   - biographical: 41 memories
+INFO |   - event: 5 memories
+INFO |   - belief: 12 memories
+INFO |   - skill: 5 memories
+INFO | 💡 Check Mem0 dashboard for user ID: 'lars'
+INFO | 🎉 Successfully completed Mem0 upload for user: lars
+INFO | ✅ Profile successfully uploaded to Mem0

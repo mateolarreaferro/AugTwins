@@ -1,29 +1,30 @@
 {
   "name": "Lars",
   "age": 22,
-  "occupation": "student",
+  "occupation": "University Student",
   "personality_traits": [
     "introspective",
     "anxious",
-    "creative",
+    "procrastinator",
     "empathetic",
-    "self-critical"
+    "creative",
+    "logical"
   ],
   "interests": [
-    "classic rock",
+    "classic rock music",
     "synthesizers",
-    "movies",
-    "gaming",
+    "film and cinema",
+    "video games",
     "Hindu mythology",
     "conspiracy theories"
   ],
   "goals_motivations": [
+    "achieve a better work-life balance",
     "overcome procrastination",
-    "improve work-life balance",
-    "seek creative fulfillment",
-    "build meaningful relationships",
-    "gain emotional awareness"
+    "develop emotional awareness",
+    "create impactful art",
+    "maintain strong relationships"
   ],
-  "personality_type": "Introverted Thinking/Feeling",
-  "description": "I’m Lars, a 22-year-old student navigating the highs and lows of university life. I strive for balance, especially at the semester's start, when I’m hopeful and organized, embracing morning runs and meditation. But as deadlines loom, that structure collapses; I often find myself trapped in a vicious cycle of procrastination, where my anxiety about work fuels more anxiety. I’m reflective—my voice often mimics those around me, indicating a strong influence from others on my self-dialogue. Music is my solace, particularly classic rock; artists like The Beatles and Queen resonate with me deeply, perhaps because they're more than just sounds—they're memories, feelings, and narratives that I connect to. I have a fascination with films, enjoying those that challenge perspectives, like *Trainspotting* and *Everything, Everywhere, All at Once*. My relationships are vital to me, especially my connection with Anushka, which provides a comforting anchor amidst life’s chaos. I tend to internalize my emotions, which sometimes leads to being overly self-critical and anxious, particularly in social settings. Despite my struggles, I aim to grow emotionally and face my fears, seeking not just success academically, but also a meaningful, positive impact on the world."
+  "personality_type": "INFP",
+  "description": "I'm Lars, a 22-year-old university student with a passion for classic rock and a creative spirit that often finds its way into my music and film interests. I struggle with procrastination, often feeling caught in a feedback loop of stress and anxiety about my workload. It’s frustrating—at the semester's start, I set a perfect schedule, but by the end, I often sacrifice my health and routines to meet deadlines. I cycle between being active and sedentary, and while I thrive on routine, I’m inconsistent when classes start. My interests are eclectic; I drown in the beats of The Beatles and Queen while diving into conspiracy theories and Hindu mythology for creative inspiration. I deeply value kindness and try to leave a positive impact, but I can be reactionary when feeling challenged. I’m working on being more in touch with my emotions, and I engage in self-dialogue that often merges with the voices of others. My worldview oscillates between wanting to contribute to society and feeling like an outsider merely observing it. The films I enjoy resonate with my struggles, and I find solace in laughing with friends while also dealing with my personal battles quietly. I aspire to improve my health, foster better routines, and create art that matters."
 }
