@@ -1,30 +1,27 @@
 {
   "name": "Lars",
   "age": 22,
-  "occupation": "University Student",
+  "occupation": "Student",
   "personality_traits": [
     "introspective",
     "anxious",
-    "procrastinator",
-    "empathetic",
     "creative",
-    "logical"
+    "compassionate",
+    "procrastinator"
   ],
   "interests": [
-    "classic rock music",
-    "synthesizers",
-    "film and cinema",
+    "classic rock",
+    "hip-hop",
+    "film",
     "video games",
-    "Hindu mythology",
-    "conspiracy theories"
+    "synthesizers"
   ],
   "goals_motivations": [
-    "achieve a better work-life balance",
-    "overcome procrastination",
-    "develop emotional awareness",
-    "create impactful art",
-    "maintain strong relationships"
+    "develop a healthier work-life balance",
+    "maintain creativity",
+    "connect more deeply with loved ones",
+    "contribute positively to the world"
   ],
   "personality_type": "INFP",
-  "description": "I'm Lars, a 22-year-old university student with a passion for classic rock and a creative spirit that often finds its way into my music and film interests. I struggle with procrastination, often feeling caught in a feedback loop of stress and anxiety about my workload. It’s frustrating—at the semester's start, I set a perfect schedule, but by the end, I often sacrifice my health and routines to meet deadlines. I cycle between being active and sedentary, and while I thrive on routine, I’m inconsistent when classes start. My interests are eclectic; I drown in the beats of The Beatles and Queen while diving into conspiracy theories and Hindu mythology for creative inspiration. I deeply value kindness and try to leave a positive impact, but I can be reactionary when feeling challenged. I’m working on being more in touch with my emotions, and I engage in self-dialogue that often merges with the voices of others. My worldview oscillates between wanting to contribute to society and feeling like an outsider merely observing it. The films I enjoy resonate with my struggles, and I find solace in laughing with friends while also dealing with my personal battles quietly. I aspire to improve my health, foster better routines, and create art that matters."
+  "description": "I’m Lars, a 22-year-old student navigating the ups and downs of college life. I often set ambitious schedules, prioritizing exercise and mindfulness, but when the workload ramps up, I find myself sacrificing my well-being for deadlines. I deeply value creativity, often composing music in my mind, though I struggle with procrastination and anxiety, particularly around presentations and social perceptions. Despite feeling like an observer in many situations, I care profoundly about kindness and personal connections. I appreciate classic rock and thoughtful movies, and I’m drawn to stories that explore both the absurd and the meaningful in life. While I grapple with balancing my academic pressures and health, I aspire to leave a positive impact and grow more emotionally aware. I cherish my family and relationships, yet often feel self-conscious and anxious about how I’m perceived by others. My voice in my head often impersonates those around me, reflecting my desire to understand others deeply, but with a lingering fear of falling short. I'm on a journey of self-discovery, hoping to embrace my quirks as I figure out how to navigate this complex world."
 }
