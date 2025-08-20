@@ -26,17 +26,31 @@ def chat(
     model: str = "gpt-4o-mini",
     temperature: float = 0.2,
     max_tokens: Optional[int] = None,
+    max_completion_tokens: Optional[int] = None,
 ) -> str:
     """Basic wrapper that returns *only* the assistant reply string."""
     if not client:
         raise RuntimeError("OpenAI client unavailable")
-    resp = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    return resp.choices[0].message.content.strip()
+    
+    # Use max_completion_tokens for GPT-5 models, max_tokens for others
+    kwargs = {
+        "model": model,
+        "messages": messages,
+        "temperature": temperature,
+    }
+    
+    if model.startswith("gpt-5"):
+        if max_completion_tokens is not None:
+            kwargs["max_completion_tokens"] = max_completion_tokens
+        elif max_tokens is not None:
+            kwargs["max_completion_tokens"] = max_tokens
+    else:
+        if max_tokens is not None:
+            kwargs["max_tokens"] = max_tokens
+    
+    resp = client.chat.completions.create(**kwargs)
+    content = resp.choices[0].message.content
+    return content.strip() if content else ""
 
 
 # convenience alias for the code-assistant REPL

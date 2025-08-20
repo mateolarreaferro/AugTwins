@@ -159,13 +159,17 @@ def generate_utterance(
         f"User: {user_msg}\n{agent_name}:"
     )
     cfg = pick_model(mode)
+    # Set temperature to 1.0 for GPT-5 models
+    if cfg["model"].startswith("gpt-5"):
+        temperature = 1.0
+    
     answer = llm_utils.chat(
         [{"role": "system", "content": prompt}],
         model=cfg["model"],
         temperature=temperature,
-        max_tokens=cfg["max_tokens"],
+        max_completion_tokens=cfg["max_completion_tokens"],
     )
-    cleaned = answer.lstrip()
+    cleaned = answer.lstrip() if answer else ""
     prefix = f"{agent_name}:"
     if cleaned.lower().startswith(prefix.lower()):
         cleaned = cleaned[len(prefix):].lstrip()
