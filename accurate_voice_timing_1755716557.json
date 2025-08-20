@@ -1,0 +1,78 @@
+{
+  "timestamp": "2025-08-20T15:02:37.999153",
+  "note": "TTS starts during HTTP response generation, not after",
+  "results": [
+    {
+      "message": "Hi",
+      "mode": "conversation",
+      "total_response_time": 7.314720153808594,
+      "estimated_voice_latency": 6.217512130737305,
+      "response_length": 59,
+      "audio_enabled": true
+    },
+    {
+      "message": "Hi",
+      "mode": "conversation",
+      "total_response_time": 5.878602981567383,
+      "estimated_voice_latency": 4.996812582015991,
+      "response_length": 34,
+      "audio_enabled": true
+    },
+    {
+      "message": "Hi",
+      "mode": "conversation",
+      "total_response_time": 6.988377809524536,
+      "estimated_voice_latency": 5.940121173858643,
+      "response_length": 47,
+      "audio_enabled": true
+    },
+    {
+      "message": "How are you?",
+      "mode": "conversation",
+      "total_response_time": 8.252192974090576,
+      "estimated_voice_latency": 7.014364004135132,
+      "response_length": 72,
+      "audio_enabled": true
+    },
+    {
+      "message": "How are you?",
+      "mode": "conversation",
+      "total_response_time": 8.943379878997803,
+      "estimated_voice_latency": 7.60187292098999,
+      "response_length": 77,
+      "audio_enabled": true
+    },
+    {
+      "message": "How are you?",
+      "mode": "conversation",
+      "total_response_time": 10.382867813110352,
+      "estimated_voice_latency": 8.825437545776367,
+      "response_length": 102,
+      "audio_enabled": true
+    },
+    {
+      "message": "What did you do today?",
+      "mode": "conversation",
+      "total_response_time": 10.84563684463501,
+      "estimated_voice_latency": 9.218791246414185,
+      "response_length": 74,
+      "audio_enabled": true
+    },
+    {
+      "message": "What did you do today?",
+      "mode": "conversation",
+      "total_response_time": 11.991887092590332,
+      "estimated_voice_latency": 10.193104028701782,
+      "response_length": 74,
+      "audio_enabled": true
+    },
+    {
+      "message": "What did you do today?",
+      "mode": "conversation",
+      "total_response_time": 10.811919927597046,
+      "estimated_voice_latency": 9.190131902694702,
+      "response_length": 74,
+      "audio_enabled": true
+    }
+  ]
+}

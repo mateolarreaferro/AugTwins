@@ -1,0 +1,83 @@
+{
+  "timestamp": "2025-08-20T14:47:44.721961",
+  "total_tests": 3,
+  "http_chat": {
+    "count": 3,
+    "label": "HTTP Chat Response Time",
+    "min": 8.719170093536377,
+    "max": 13.221465110778809,
+    "mean": 11.006145079930624,
+    "median": 11.077800035476685,
+    "std_dev": 2.2520026487689213
+  },
+  "websocket_first_audio": {
+    "count": 0,
+    "label": "WebSocket First Audio Latency"
+  },
+  "websocket_total": {
+    "count": 0,
+    "label": "WebSocket Total Streaming Time"
+  },
+  "raw_results": [
+    {
+      "test": 1,
+      "type": "http",
+      "success": true,
+      "total_time": 11.077800035476685,
+      "audio_enabled": true,
+      "response_length": 96,
+      "message": "Hello, how are you?"
+    },
+    {
+      "test": 1,
+      "type": "websocket",
+      "success": true,
+      "connection_time": 0.03813886642456055,
+      "prompt_sent_time": 0.03824114799499512,
+      "first_audio_latency": null,
+      "total_streaming_time": null,
+      "audio_chunks": 0,
+      "message": "Hello, how are you?"
+    },
+    {
+      "test": 2,
+      "type": "http",
+      "success": true,
+      "total_time": 13.221465110778809,
+      "audio_enabled": true,
+      "response_length": 140,
+      "message": "Tell me about your day."
+    },
+    {
+      "test": 2,
+      "type": "websocket",
+      "success": true,
+      "connection_time": 0.005103111267089844,
+      "prompt_sent_time": 0.00520014762878418,
+      "first_audio_latency": null,
+      "total_streaming_time": null,
+      "audio_chunks": 0,
+      "message": "Tell me about your day."
+    },
+    {
+      "test": 3,
+      "type": "http",
+      "success": true,
+      "total_time": 8.719170093536377,
+      "audio_enabled": true,
+      "response_length": 71,
+      "message": "What's your favorite hobby?"
+    },
+    {
+      "test": 3,
+      "type": "websocket",
+      "success": true,
+      "connection_time": 0.0024929046630859375,
+      "prompt_sent_time": 0.002582073211669922,
+      "first_audio_latency": null,
+      "total_streaming_time": null,
+      "audio_chunks": 0,
+      "message": "What's your favorite hobby?"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "timestamp": "2025-08-20T14:58:09.053681",
+  "total_tests": 9,
+  "results": [
+    {
+      "message": "Hi",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 5.088829278945923,
+      "estimated_tts_delay": 1.575,
+      "total_voice_latency": 6.663829326629639,
+      "response_length": 15,
+      "response_text": "Hey! What\u2019s up?"
+    },
+    {
+      "message": "Hi",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 7.1282289028167725,
+      "estimated_tts_delay": 1.8,
+      "total_voice_latency": 8.928228855133057,
+      "response_length": 60,
+      "response_text": "Hey! Just trying to keep up with everything. What about you?"
+    },
+    {
+      "message": "Hi",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 7.016581296920776,
+      "estimated_tts_delay": 1.775,
+      "total_voice_latency": 8.791581392288208,
+      "response_length": 55,
+      "response_text": "Hey! Just managing the usual chaos. What\u2019s up with you?"
+    },
+    {
+      "message": "How are you doing today?",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 12.968326091766357,
+      "estimated_tts_delay": 2.0,
+      "total_voice_latency": 14.968326091766357,
+      "response_length": 108,
+      "response_text": "I\u2019m hanging in there, just keeping up with classes and trying to stick to my running routine. How about you?"
+    },
+    {
+      "message": "How are you doing today?",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 9.482386112213135,
+      "estimated_tts_delay": 1.97,
+      "total_voice_latency": 11.452386140823364,
+      "response_length": 94,
+      "response_text": "I\u2019m doing okay, just juggling classes and trying to stick with my morning runs. How about you?"
+    },
+    {
+      "message": "How are you doing today?",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 10.502640008926392,
+      "estimated_tts_delay": 1.935,
+      "total_voice_latency": 12.437639951705933,
+      "response_length": 87,
+      "response_text": "I\u2019m hanging in there, just keeping up with classes and my morning runs. What about you?"
+    },
+    {
+      "message": "Tell me about your favorite hobby and why you enjoy it",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 15.048357963562012,
+      "estimated_tts_delay": 2.0,
+      "total_voice_latency": 17.04835796356201,
+      "response_length": 108,
+      "response_text": "I love making music; it\u2019s my go-to creative outlet. It lets me express myself and escape into another world."
+    },
+    {
+      "message": "Tell me about your favorite hobby and why you enjoy it",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 14.291795015335083,
+      "estimated_tts_delay": 2.0,
+      "total_voice_latency": 16.291795015335083,
+      "response_length": 128,
+      "response_text": "I love making music; it\u2019s where I find my voice and get lost in creativity. It\u2019s like a safe space for my thoughts and feelings."
+    },
+    {
+      "message": "Tell me about your favorite hobby and why you enjoy it",
+      "mode": "conversation",
+      "success": true,
+      "text_latency": 16.285866022109985,
+      "estimated_tts_delay": 2.0,
+      "total_voice_latency": 18.285866022109985,
+      "response_length": 150,
+      "response_text": "I love making music; it's my main creative outlet and helps me express what I can't say otherwise. It feels like pure freedom to dive into that world."
+    }
+  ]
+}
