@@ -854,66 +854,59 @@ def build_openai_client() -> OpenAI:
     return OpenAI(api_key=OPENAI_API_KEY)
 
 
-def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utterance: Dict[str, Any], user_id: str) -> bool:
-    """Upload agent profile data to Mem0 memory system."""
+def upload_to_mem0(transcript: str, persona: Dict[str, Any], utterance: Dict[str, Any], user_id: str) -> bool:
+    """Upload agent profile data to Mem0 memory system.
+
+    Instead of pre-extracted memories, send raw transcript chunks so Mem0 can
+    perform memory extraction.
+    """
     if not MEM0_AVAILABLE:
         logging.warning("Mem0 not available - skipping memory upload. Install with: pip install mem0ai")
         return False
-    
+
     try:
         # Get Mem0 Pro credentials
         from config import MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID
         if not all([MEM0_API_KEY, MEM0_ORG_ID, MEM0_PROJECT_ID]):
             logging.warning("Mem0 Pro credentials not found in config - skipping memory upload")
             return False
-        
+
         # Initialize Mem0 Pro client
         m = MemoryClient(
             api_key=MEM0_API_KEY,
             org_id=MEM0_ORG_ID,
             project_id=MEM0_PROJECT_ID
         )
-        
+
         logging.info(f"Starting Mem0 upload for user '{user_id}'...")
-        memory_count = 0
-        
-        # Upload memories
-        for i, memory in enumerate(memories):
-            memory_text = memory.get("memory", "")
-            memory_type = memory.get("type", "general")
-            tags = memory.get("tags", [])
-            
-            if memory_text:
-                metadata = {
-                    "type": memory_type,
-                    "tags": tags,
-                    "source": "profile_generation",
-                    "category": memory_type
-                }
-                
-                try:
-                    messages = [{"role": "user", "content": memory_text}]
-                    result = m.add(messages, user_id=user_id, metadata=metadata)
-                    memory_count += 1
-                    if (i + 1) % 20 == 0:  # Show progress every 20 memories
-                        logging.info(f"📊 Progress: {i+1}/{len(memories)} memories uploaded")
-                except Exception as e:
-                    logging.error(f"❌ Failed to add memory {i+1}: {e}")
-        
-        logging.info(f"Uploaded {memory_count}/{len(memories)} memories to Mem0")
+
+        chunks = chunk_text(transcript, DEFAULT_CHUNK_TOKENS)
+        for i, chunk in enumerate(chunks, 1):
+            metadata = {
+                "category": "conversation",
+                "source": "profile_generation",
+            }
+            try:
+                messages = [{"role": "user", "content": chunk}]
+                m.add(messages, user_id=user_id, metadata=metadata)
+                if i % 20 == 0:
+                    logging.info(f"📊 Progress: {i}/{len(chunks)} chunks uploaded")
+            except Exception as e:
+                logging.error(f"❌ Failed to add transcript chunk {i}: {e}")
+
+        logging.info(f"Uploaded {len(chunks)} transcript chunks to Mem0")
         
         # Upload persona information
         if persona.get("description"):
             try:
                 persona_metadata = {
-                    "type": "persona",
+                    "category": "persona",
                     "personality_type": persona.get("personality_type", ""),
                     "source": "profile_generation",
-                    "category": "persona"
                 }
                 
                 messages = [{"role": "user", "content": persona['description']}]
-                result = m.add(messages, user_id=user_id, metadata=persona_metadata)
+                m.add(messages, user_id=user_id, metadata=persona_metadata)
                 logging.info("✅ Uploaded persona to Mem0")
             except Exception as e:
                 logging.error(f"❌ Failed to upload persona: {e}")
@@ -922,14 +915,13 @@ def upload_to_mem0(memories: List[Dict[str, Any]], persona: Dict[str, Any], utte
         if utterance.get("style_guide"):
             try:
                 style_metadata = {
-                    "type": "communication_style",
+                    "category": "communication",
                     "sample_phrases": utterance.get("sample_phrases", []),
                     "source": "profile_generation",
-                    "category": "communication"
                 }
                 
                 messages = [{"role": "user", "content": utterance['style_guide']}]
-                result = m.add(messages, user_id=user_id, metadata=style_metadata)
+                m.add(messages, user_id=user_id, metadata=style_metadata)
                 logging.info("✅ Uploaded communication style to Mem0")
             except Exception as e:
                 logging.error(f"❌ Failed to upload communication style: {e}")
@@ -1154,7 +1146,7 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     if args.upload_mem0:
         user_id = args.mem0_user_id or args.person.lower()
         logging.info(f"Uploading profile to Mem0 for user: {user_id}")
-        success = upload_to_mem0(memories, persona, utterance, user_id)
+        success = upload_to_mem0(full_transcript, persona, utterance, user_id)
         if success:
             logging.info("✅ Profile successfully uploaded to Mem0")
         else:

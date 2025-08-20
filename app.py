@@ -83,7 +83,11 @@ def save_conversation_history(agent, conversations: list) -> None:
 
 
 def save_new_memories_to_mem0(agent, conversations: list) -> None:
-    """Save new memories from conversation to Mem0."""
+    """Save new memories from conversation to Mem0.
+
+    Sends the full conversation as role-tagged messages so Mem0 can
+    perform its own memory extraction in a single request.
+    """
     if not conversations:
         return
     
@@ -94,27 +98,24 @@ def save_new_memories_to_mem0(agent, conversations: list) -> None:
         if hasattr(agent, '_get_mem0_client'):
             client = agent._get_mem0_client()
             if client:
-                memory_count = 0
-                for conv in conversations:
-                    # Create memory from each conversation exchange
-                    conversation_memory = f"User: {conv['user']}\n{agent.name}: {conv['agent']}"
-                    
-                    try:
-                        messages = [{"role": "user", "content": conversation_memory}]
-                        metadata = {
-                            "type": "conversation",
-                            "source": "live_chat",
-                            "timestamp": conv.get('timestamp', ''),
-                            "category": "conversation"
-                        }
-                        
-                        client.add(messages, user_id=agent.name.lower(), metadata=metadata)
-                        memory_count += 1
-                        
-                    except Exception as e:
-                        print(f"[{agent.name}] Failed to save memory: {e}")
-                
-                print(f"[{agent.name}] Saved {memory_count}/{len(conversations)} new memories to Mem0")
+                try:
+                    messages = []
+                    for conv in conversations:
+                        if conv.get("user"):
+                            messages.append({"role": "user", "content": conv.get("user", "")})
+                        if conv.get("agent"):
+                            messages.append({"role": "assistant", "content": conv.get("agent", "")})
+
+                    metadata = {
+                        "category": "conversation",
+                        "source": "live_chat",
+                        "timestamp": conversations[-1].get('timestamp', ''),
+                    }
+
+                    client.add(messages, user_id=agent.name.lower(), metadata=metadata)
+                    print(f"[{agent.name}] Saved conversation with {len(messages)} messages to Mem0")
+                except Exception as e:
+                    print(f"[{agent.name}] Failed to save memories: {e}")
             else:
                 print(f"[{agent.name}] Mem0 client not available")
         else:
