@@ -1,6 +1,6 @@
 [
   {
-    "memory": "My name is Lars Langenbach.",
+    "memory": "I am Lars Langenbach.",
     "type": "biographical",
     "tags": [
       "name"
@@ -24,18 +24,19 @@
     "memory": "I was born in Vienna, Virginia, in Fairfax County.",
     "type": "biographical",
     "tags": [
-      "birthplace"
+      "birthplace",
+      "biographical"
     ]
   },
   {
     "memory": "I currently live in a hacker house in Cambridge.",
     "type": "biographical",
     "tags": [
-      "residence"
+      "current residence"
     ]
   },
   {
-    "memory": "I am half German, 25% American, and a quarter Japanese.",
+    "memory": "My cultural and ethnic background is half German, 25% American, which originates from Switzerland, and a quarter Japanese.",
     "type": "biographical",
     "tags": [
       "ethnic background"
@@ -52,24 +53,22 @@
     "memory": "I went to the German International School of Washington, DC, for the first 14 years of my life.",
     "type": "biographical",
     "tags": [
-      "education",
-      "schooling"
+      "education"
     ]
   },
   {
-    "memory": "I moved to Frankfurt, Germany, where I went to the Humboldt-Gymnasium for about a year.",
+    "memory": "I moved to Germany and attended the Humboldt-Gymnasium for about a year.",
     "type": "biographical",
     "tags": [
       "education",
-      "Germany"
+      "relocation"
     ]
   },
   {
-    "memory": "I switched to the Stratdorf International School for the last three years of high school.",
+    "memory": "I switched to the Stratdorf International School for the rest of my high school, which was three years.",
     "type": "biographical",
     "tags": [
-      "education",
-      "high school"
+      "education"
     ]
   },
   {
@@ -77,7 +76,6 @@
     "type": "biographical",
     "tags": [
       "education",
-      "college",
       "major"
     ]
   },
@@ -89,11 +87,19 @@
     ]
   },
   {
-    "memory": "My first job was a SCAD intramurals gym assistant.",
-    "type": "biographical",
+    "memory": "My first job was as a SCAD intramurals gym assistant.",
+    "type": "event",
     "tags": [
       "employment",
       "first job"
+    ]
+  },
+  {
+    "memory": "I took a break from my gym assistant job before leaving for the summer because I had too much classwork.",
+    "type": "event",
+    "tags": [
+      "employment",
+      "break"
     ]
   },
   {
@@ -104,123 +110,130 @@
     ]
   },
   {
-    "memory": "I am scared of becoming a corporate slave.",
+    "memory": "I am really scared of becoming a corporate slave.",
     "type": "belief",
     "tags": [
-      "work culture",
-      "values"
+      "career",
+      "belief"
+    ]
+  },
+  {
+    "memory": "I believe my values about work may change as I grow older and have children.",
+    "type": "belief",
+    "tags": [
+      "values",
+      "work"
+    ]
+  },
+  {
+    "memory": "My mom is a veterinarian and started her own business.",
+    "type": "biographical",
+    "tags": [
+      "family",
+      "mother"
     ]
   },
   {
     "memory": "I have been the social media manager for the Immersive Reality Club at SCAD.",
-    "type": "biographical",
+    "type": "event",
     "tags": [
       "club involvement"
     ]
   },
   {
-    "memory": "I used to swim a lot and was part of my neighborhood swim team.",
+    "memory": "I am going to be the next co-president of the Immersive Reality Club at SCAD alongside Anushka.",
     "type": "event",
     "tags": [
-      "sports",
-      "swimming"
+      "club involvement",
+      "leadership"
+    ]
+  },
+  {
+    "memory": "I used to swim and was part of a neighborhood swim team.",
+    "type": "event",
+    "tags": [
+      "hobbies",
+      "sports"
     ]
   },
   {
     "memory": "I grew up in an atheist family.",
     "type": "biographical",
     "tags": [
-      "family background",
       "religion"
     ]
   },
   {
-    "memory": "I started practicing Hinduism about a year ago.",
+    "memory": "I was introduced to Hinduism through Anushka and now practice the religion.",
     "type": "belief",
     "tags": [
       "religion",
-      "belief evolution"
+      "conversion"
     ]
   },
   {
-    "memory": "I don't like arrogant or condescending people.",
+    "memory": "I dislike arrogant and condescending people.",
     "type": "belief",
     "tags": [
-      "social preferences",
-      "anger triggers"
+      "social preferences"
     ]
   },
   {
-    "memory": "I can't stand being talked to like a child.",
+    "memory": "I find it annoying when people talk to others like they are children.",
     "type": "belief",
     "tags": [
-      "social preferences",
-      "anger triggers"
+      "social preferences"
     ]
   },
   {
-    "memory": "I feel uncomfortable discussing topics like racism.",
+    "memory": "I appreciate doing favors for people but dislike feeling taken advantage of.",
     "type": "belief",
     "tags": [
-      "social discomfort"
+      "social preferences"
     ]
   },
   {
-    "memory": "I value kindness and respect in discussions about sensitive topics.",
-    "type": "belief",
-    "tags": [
-      "social values"
-    ]
-  },
-  {
-    "memory": "I find dry humor funny.",
+    "memory": "I find dry humor funny and enjoy absurd jokes.",
     "type": "preference",
     "tags": [
       "humor"
     ]
   },
   {
-    "memory": "I resent it when Americans overly criticize Germany's past.",
-    "type": "belief",
-    "tags": [
-      "cultural perspectives"
-    ]
-  },
-  {
     "memory": "I voted for Kamala Harris in the last election.",
     "type": "belief",
     "tags": [
-      "politics"
+      "political views"
     ]
   },
   {
-    "memory": "I am currently in a loving relationship with my partner Anushka.",
-    "type": "biographical",
-    "tags": [
-      "relationship"
-    ]
-  },
-  {
-    "memory": "I spend almost every day together with Anushka.",
-    "type": "biographical",
-    "tags": [
-      "relationship"
-    ]
-  },
-  {
-    "memory": "I believe that raising a family will change my values about work.",
+    "memory": "I feel scared of the dark and shady street corners.",
     "type": "belief",
     "tags": [
-      "family",
-      "work values"
+      "fears"
     ]
   },
   {
-    "memory": "I think four-day work weeks are a blessing.",
+    "memory": "I have a long dream journal that spans over a couple of years.",
+    "type": "event",
+    "tags": [
+      "dreams"
+    ]
+  },
+  {
+    "memory": "My closest relationship is with my partner Anushka, and we spend almost every moment together.",
+    "type": "event",
+    "tags": [
+      "relationships",
+      "partner"
+    ]
+  },
+  {
+    "memory": "I feel grateful to have Anushka in my life as she makes me a better person.",
     "type": "belief",
     "tags": [
-      "work culture",
-      "values"
+      "relationships",
+      "gratitude"
     ]
   },
   {
@@ -228,120 +241,163 @@
     "type": "biographical",
     "tags": [
       "family",
-      "brother",
-      "relationship"
+      "brother"
     ]
   },
   {
-    "memory": "I think it's important to take care of each other and treat each other well.",
+    "memory": "I feel extremely grateful to have Wolf as a part of my life.",
     "type": "belief",
     "tags": [
-      "relationships",
-      "values"
+      "gratitude",
+      "family"
     ]
   },
   {
-    "memory": "I have a good relationship with my little sister, who is seven years younger than me.",
+    "memory": "I have always played video games with my brother Wolf.",
+    "type": "event",
+    "tags": [
+      "family",
+      "gaming"
+    ]
+  },
+  {
+    "memory": "I have a close relationship with my little sister, who is seven years younger than me.",
     "type": "biographical",
     "tags": [
       "family",
-      "sister",
-      "relationship"
+      "sister"
     ]
   },
   {
-    "memory": "My mother has always been a superhero in my eyes and has provided a lot for my family.",
+    "memory": "My mother has provided a lot for my family and is like a superhero in my eyes.",
     "type": "belief",
     "tags": [
       "family",
-      "mother",
-      "values"
+      "mother"
     ]
   },
   {
-    "memory": "My father encouraged my brother and me to be very creative.",
-    "type": "belief",
+    "memory": "I moved to Germany with my family when I was a teenager.",
+    "type": "event",
+    "tags": [
+      "biography",
+      "relocation"
+    ]
+  },
+  {
+    "memory": "I have had a good relationship with my father, who is a nerd and enjoys sci-fi and fantasy.",
+    "type": "biographical",
     "tags": [
       "family",
-      "father",
-      "creativity"
+      "father"
     ]
   },
   {
-    "memory": "I have known my best friend Lucas since kindergarten.",
-    "type": "biographical",
-    "tags": [
-      "friendship",
-      "long-term"
-    ]
-  },
-  {
-    "memory": "I tend to get along well with my friends, often supporting each other's creative endeavors.",
+    "memory": "I've been fortunate to make good friends wherever I go.",
     "type": "belief",
     "tags": [
       "friendship",
-      "creativity"
+      "social"
     ]
   },
   {
-    "memory": "I met my friend Ulyss during high school and we lived together for a long time.",
+    "memory": "Lucas Witzka is one of my best friends, and we met in kindergarten.",
     "type": "biographical",
     "tags": [
       "friendship",
-      "living situation"
+      "childhood"
     ]
   },
   {
-    "memory": "I love making music and have made it a creative outlet since high school.",
-    "type": "skill",
-    "tags": [
-      "music",
-      "creativity"
-    ]
-  },
-  {
-    "memory": "I have a pet bearded dragon named Sara Ali Khan, who is currently in my life.",
+    "memory": "I have lived with my friend Ulyss during high school, and he became like a twin brother to me.",
     "type": "biographical",
     "tags": [
-      "pets",
-      "bearded dragon"
+      "friendship",
+      "living together"
     ]
   },
   {
-    "memory": "My favorite hobbies include drawing, painting, and immersive media.",
+    "memory": "Tom Spiegel is a friend I met in the German public school, Humboldt Gymnasium.",
+    "type": "biographical",
+    "tags": [
+      "friendship",
+      "school"
+    ]
+  },
+  {
+    "memory": "My best friend at SCAD is Ben Hammond, with whom I have lived throughout my time there.",
+    "type": "biographical",
+    "tags": [
+      "friendship",
+      "college"
+    ]
+  },
+  {
+    "memory": "I have always liked to draw since I was a kid.",
     "type": "preference",
     "tags": [
-      "hobbies",
+      "hobby",
       "art"
     ]
   },
   {
-    "memory": "I enjoy watching movies, particularly sci-fi and adventure films.",
+    "memory": "I enjoy making music with my best friend Ulyss.",
+    "type": "preference",
+    "tags": [
+      "music",
+      "hobby"
+    ]
+  },
+  {
+    "memory": "I've always found drawing easy when listening to music.",
+    "type": "belief",
+    "tags": [
+      "art",
+      "music"
+    ]
+  },
+  {
+    "memory": "I love to watch movies, especially sci-fi and adventure films.",
     "type": "preference",
     "tags": [
       "movies",
-      "sci-fi",
-      "adventure"
+      "entertainment"
     ]
   },
   {
-    "memory": "I have a habit of procrastinating, which affects my work quality.",
-    "type": "belief",
-    "tags": [
-      "personal habits",
-      "productivity"
-    ]
-  },
-  {
-    "memory": "I like to exercise and have recently been running in the mornings.",
+    "memory": "I enjoy historical artifacts and art, and I like going to museums.",
     "type": "preference",
     "tags": [
-      "exercise",
-      "running"
+      "culture",
+      "art"
     ]
   },
   {
-    "memory": "I usually prefer to get eight hours of sleep but have adapted to less due to college life.",
+    "memory": "I am currently obsessed with the Beatles.",
+    "type": "preference",
+    "tags": [
+      "music",
+      "obsession"
+    ]
+  },
+  {
+    "memory": "I enjoy learning about the creative process and art in general.",
+    "type": "belief",
+    "tags": [
+      "art",
+      "creativity"
+    ]
+  },
+  {
+    "memory": "I am typically very active during summer but become less active during the school year due to workload.",
+    "type": "belief",
+    "tags": [
+      "fitness",
+      "school"
+    ]
+  },
+  {
+    "memory": "I prefer to get eight hours of sleep but have learned to function on less due to college.",
     "type": "belief",
     "tags": [
       "sleep",
@@ -349,36 +405,58 @@
     ]
   },
   {
-    "memory": "I experience anxiety, especially in social situations or during presentations.",
+    "memory": "I have experienced anxiety, especially in social situations.",
     "type": "belief",
     "tags": [
-      "mental health",
-      "anxiety"
+      "anxiety",
+      "social"
     ]
   },
   {
-    "memory": "I make decisions by weighing pros and cons and trying to be rational.",
+    "memory": "I handle conflict by trying to be diplomatic and understanding other people's perspectives.",
     "type": "belief",
     "tags": [
-      "decision-making",
-      "rationality"
+      "conflict",
+      "communication"
     ]
   },
   {
-    "memory": "I have used WhatsApp as my primary messaging app for communication.",
+    "memory": "My current pet is a bearded dragon named Sara Ali Khan.",
     "type": "biographical",
     "tags": [
-      "technology",
-      "apps"
+      "pet",
+      "bearded dragon"
     ]
   },
   {
-    "memory": "I believe digital privacy is a significant concern regarding AI technology.",
+    "memory": "I had a cat named Itchy who passed away in 2022 and was very important to me.",
+    "type": "biographical",
+    "tags": [
+      "pet",
+      "cat"
+    ]
+  },
+  {
+    "memory": "I believe that AI can be a useful tool but is limited in its application.",
     "type": "belief",
     "tags": [
       "technology",
-      "AI",
-      "privacy"
+      "AI"
+    ]
+  },
+  {
+    "memory": "I make decisions by weighing pros and cons and trying not to be reactionary.",
+    "type": "belief",
+    "tags": [
+      "decision-making"
+    ]
+  },
+  {
+    "memory": "I enjoy cooking, even though I'm not great at it.",
+    "type": "preference",
+    "tags": [
+      "cooking",
+      "hobby"
     ]
   },
   {
@@ -386,7 +464,8 @@
     "type": "belief",
     "tags": [
       "kindness",
-      "belief"
+      "values",
+      "beliefs"
     ]
   },
   {
@@ -394,7 +473,8 @@
     "type": "belief",
     "tags": [
       "family",
-      "belief"
+      "values",
+      "beliefs"
     ]
   },
   {
@@ -402,151 +482,133 @@
     "type": "belief",
     "tags": [
       "love",
-      "belief"
+      "relationships",
+      "beliefs"
     ]
   },
   {
-    "memory": "I believe in having a lasting positive impact on the world.",
-    "type": "belief",
-    "tags": [
-      "impact",
-      "belief"
-    ]
-  },
-  {
-    "memory": "I try to treat others well.",
-    "type": "belief",
-    "tags": [
-      "kindness",
-      "treatment"
-    ]
-  },
-  {
-    "memory": "I believe in holding people accountable.",
+    "memory": "I believe in holding people accountable for their actions.",
     "type": "belief",
     "tags": [
       "accountability",
-      "belief"
+      "beliefs"
     ]
   },
   {
-    "memory": "I have a reactionary side when people are rude to me.",
-    "type": "belief",
-    "tags": [
-      "anger",
-      "reaction"
-    ]
-  },
-  {
-    "memory": "I try to think logically.",
+    "memory": "I try to think very logically.",
     "type": "belief",
     "tags": [
       "logic",
-      "thinking"
+      "thinking",
+      "beliefs"
     ]
   },
   {
-    "memory": "I have been trying to trust my intuition more lately.",
+    "memory": "I have been trying to trust my intuition more.",
     "type": "belief",
     "tags": [
       "intuition",
-      "personal growth"
+      "self-improvement",
+      "beliefs"
     ]
   },
   {
-    "memory": "I feel out of touch with my emotions.",
+    "memory": "I feel very out of touch with my emotions.",
     "type": "belief",
     "tags": [
       "emotions",
-      "self-awareness"
+      "self-awareness",
+      "beliefs"
     ]
   },
   {
-    "memory": "I enjoy reading, but I don't read a lot.",
-    "type": "preference",
-    "tags": [
-      "reading",
-      "hobby"
-    ]
-  },
-  {
-    "memory": "One of my favorite books is 'A Fear and Loathing in Las Vegas'.",
+    "memory": "I like A Fear and Loathing in Las Vegas.",
     "type": "preference",
     "tags": [
       "books",
-      "favorites"
+      "preferences",
+      "A Fear and Loathing in Las Vegas"
     ]
   },
   {
-    "memory": "I really liked 'Miss Peregrine's Home for Peculiar Children'.",
+    "memory": "I really liked Mrs. Peregrine's Home for Peculiar Children.",
     "type": "preference",
     "tags": [
       "books",
-      "favorites"
+      "preferences",
+      "Mrs. Peregrine's Home for Peculiar Children"
     ]
   },
   {
-    "memory": "One of my favorite children's books is 'Where the Wild Things Are'.",
+    "memory": "One of my favorite children's books is Where the Wild Things Are.",
     "type": "preference",
     "tags": [
-      "children's books",
-      "favorites"
+      "books",
+      "preferences",
+      "Where the Wild Things Are"
     ]
   },
   {
-    "memory": "I watch a lot of movies.",
-    "type": "preference",
-    "tags": [
-      "movies",
-      "hobby"
-    ]
-  },
-  {
-    "memory": "I really like the movie 'Trainspotting'.",
+    "memory": "I really like the movie Trainspotting.",
     "type": "preference",
     "tags": [
       "movies",
-      "favorites"
+      "preferences",
+      "Trainspotting"
     ]
   },
   {
-    "memory": "I thought 'Everything, Everywhere, All at Once' was a great film.",
+    "memory": "I like Everything, Everywhere, All at Once.",
     "type": "preference",
     "tags": [
       "movies",
-      "favorites"
+      "preferences",
+      "Everything Everywhere All at Once"
     ]
   },
   {
-    "memory": "I love 'Star Wars'.",
+    "memory": "I love Star Wars.",
     "type": "preference",
     "tags": [
       "movies",
-      "favorites"
+      "preferences",
+      "Star Wars"
     ]
   },
   {
-    "memory": "I like dramas but I'm not super into romantic comedies.",
+    "memory": "I like dramas.",
     "type": "preference",
     "tags": [
       "movies",
-      "genre preference"
+      "preferences",
+      "dramas"
     ]
   },
   {
-    "memory": "I enjoy funny movies.",
+    "memory": "I'm not super into romantic comedies.",
     "type": "preference",
     "tags": [
       "movies",
-      "genre preference"
+      "preferences",
+      "romantic comedies"
     ]
   },
   {
-    "memory": "I like Wes Anderson's films.",
+    "memory": "I like funny movies.",
     "type": "preference",
     "tags": [
       "movies",
-      "favorites"
+      "preferences",
+      "comedy"
+    ]
+  },
+  {
+    "memory": "I like Wes Anderson films.",
+    "type": "preference",
+    "tags": [
+      "movies",
+      "preferences",
+      "Wes Anderson"
     ]
   },
   {
@@ -554,47 +616,44 @@
     "type": "preference",
     "tags": [
       "games",
-      "favorites"
+      "preferences",
+      "Minecraft"
     ]
   },
   {
-    "memory": "I was into Sea of Thieves for a long time.",
+    "memory": "I was really into Sea of Thieves for a long time with my middle school friends.",
     "type": "event",
     "tags": [
-      "gaming",
-      "past experience"
+      "games",
+      "preferences",
+      "Sea of Thieves"
     ]
   },
   {
-    "memory": "My brother and I played Rainbow Six Siege a lot.",
+    "memory": "I played Rainbow Six Siege a lot with my brother.",
     "type": "event",
     "tags": [
-      "gaming",
-      "family"
+      "games",
+      "preferences",
+      "Rainbow Six Siege"
     ]
   },
   {
-    "memory": "I prefer playing on PC over consoles.",
+    "memory": "I prefer playing on PC over console games.",
     "type": "preference",
     "tags": [
-      "gaming",
-      "platform preference"
+      "games",
+      "preferences",
+      "PC games"
     ]
   },
   {
-    "memory": "I loved watching shows like 'Breaking Bad' and 'Better Call Saul'.",
+    "memory": "I loved Gravity Falls growing up.",
     "type": "preference",
     "tags": [
       "TV shows",
-      "favorites"
-    ]
-  },
-  {
-    "memory": "I loved 'Gravity Falls' while growing up.",
-    "type": "preference",
-    "tags": [
-      "TV shows",
-      "favorites"
+      "preferences",
+      "Gravity Falls"
     ]
   },
   {
@@ -602,31 +661,18 @@
     "type": "preference",
     "tags": [
       "music",
-      "favorites"
+      "preferences",
+      "classic rock"
     ]
   },
   {
-    "memory": "Rap music is one of the genres I like.",
+    "memory": "The Beatles and Queen are among my favorite classic rock bands.",
     "type": "preference",
     "tags": [
       "music",
-      "genre preference"
-    ]
-  },
-  {
-    "memory": "Some of my favorite artists include The Beatles, Queen, and David Bowie.",
-    "type": "preference",
-    "tags": [
-      "music",
-      "favorites"
-    ]
-  },
-  {
-    "memory": "I find conspiracy theories entertaining.",
-    "type": "belief",
-    "tags": [
-      "belief",
-      "entertainment"
+      "preferences",
+      "The Beatles",
+      "Queen"
     ]
   },
   {
@@ -634,31 +680,755 @@
     "type": "belief",
     "tags": [
       "mythology",
-      "belief"
+      "beliefs",
+      "Hindu"
+    ]
+  },
+  {
+    "memory": "I find conspiracy theories to be entertaining.",
+    "type": "belief",
+    "tags": [
+      "entertainment",
+      "beliefs",
+      "conspiracy theories"
+    ]
+  },
+  {
+    "memory": "I speak relatively slowly in conversations.",
+    "type": "biographical",
+    "tags": [
+      "speech",
+      "communication",
+      "biography"
+    ]
+  },
+  {
+    "memory": "I enjoy making jokes and imitations.",
+    "type": "skill",
+    "tags": [
+      "humor",
+      "skill",
+      "impressions"
     ]
   },
   {
     "memory": "I often feel like an observer of the world around me.",
     "type": "belief",
     "tags": [
-      "self-awareness",
-      "belief"
+      "observation",
+      "beliefs",
+      "introversion"
     ]
   },
   {
-    "memory": "I can do impressions.",
-    "type": "skill",
-    "tags": [
-      "skill",
-      "impressions"
-    ]
-  },
-  {
-    "memory": "I speak relatively slowly.",
+    "memory": "My name is Lars Langenbach.",
     "type": "biographical",
     "tags": [
-      "speech",
-      "biography"
+      "name"
+    ]
+  },
+  {
+    "memory": "I was born on July 28, 2004.",
+    "type": "biographical",
+    "tags": [
+      "birthday",
+      "date of birth"
+    ]
+  },
+  {
+    "memory": "I am male.",
+    "type": "biographical",
+    "tags": [
+      "gender"
+    ]
+  },
+  {
+    "memory": "My email address is Larz.Larsenator@gmail.com.",
+    "type": "biographical",
+    "tags": [
+      "email"
+    ]
+  },
+  {
+    "memory": "I am approximately 21 years old.",
+    "type": "biographical",
+    "tags": [
+      "age"
+    ]
+  },
+  {
+    "memory": "I identify as male.",
+    "type": "biographical",
+    "tags": [
+      "gender"
+    ]
+  },
+  {
+    "memory": "I use custom search engines like Adobe Fonts and freesound.org.",
+    "type": "preference",
+    "tags": [
+      "custom search engines"
+    ]
+  },
+  {
+    "memory": "I frequently encounter the languages German and Spanish.",
+    "type": "preference",
+    "tags": [
+      "languages",
+      "German",
+      "Spanish"
+    ]
+  },
+  {
+    "memory": "My language preferences are English (US).",
+    "type": "preference",
+    "tags": [
+      "language preferences",
+      "English"
+    ]
+  },
+  {
+    "memory": "I have custom browser shortcuts for Zoom, Google Drive, Blackboard, Dropbox, ChatGPT, Gmail, MySCAD, and WhatsApp.",
+    "type": "skill",
+    "tags": [
+      "browser shortcuts"
+    ]
+  },
+  {
+    "memory": "I use a text highlighter tool for my research and study habits.",
+    "type": "preference",
+    "tags": [
+      "browser extension",
+      "study",
+      "research"
+    ]
+  },
+  {
+    "memory": "I use Adblock Plus because I am privacy-conscious.",
+    "type": "preference",
+    "tags": [
+      "browser extension",
+      "privacy"
+    ]
+  },
+  {
+    "memory": "I frequently visit docs.google.com for my Google Docs and Google Slides projects.",
+    "type": "preference",
+    "tags": [
+      "docs",
+      "Google",
+      "documents"
+    ]
+  },
+  {
+    "memory": "I often use scad.blackboard.com for my courses and announcements.",
+    "type": "preference",
+    "tags": [
+      "education",
+      "SCAD",
+      "courses"
+    ]
+  },
+  {
+    "memory": "I enjoy watching music-related content on YouTube, particularly drum loops.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "music",
+      "drum loops"
+    ]
+  },
+  {
+    "memory": "I regularly check my notifications and posts on LinkedIn.",
+    "type": "preference",
+    "tags": [
+      "LinkedIn",
+      "social media",
+      "notifications"
+    ]
+  },
+  {
+    "memory": "I use dropbox.com to save important presentations and headshots.",
+    "type": "preference",
+    "tags": [
+      "Dropbox",
+      "files",
+      "presentations"
+    ]
+  },
+  {
+    "memory": "I conduct searches on Google for various topics of interest.",
+    "type": "preference",
+    "tags": [
+      "Google",
+      "search"
+    ]
+  },
+  {
+    "memory": "I visit suno.com for AI music.",
+    "type": "preference",
+    "tags": [
+      "Suno",
+      "AI",
+      "music"
+    ]
+  },
+  {
+    "memory": "I use chatgpt.com for generating text and explanations.",
+    "type": "preference",
+    "tags": [
+      "ChatGPT",
+      "AI",
+      "text generation"
+    ]
+  },
+  {
+    "memory": "I utilize Figma for brainstorming and team collaboration.",
+    "type": "preference",
+    "tags": [
+      "Figma",
+      "design",
+      "collaboration"
+    ]
+  },
+  {
+    "memory": "I listen to music on Spotify, enjoying a variety of artists and songs.",
+    "type": "preference",
+    "tags": [
+      "Spotify",
+      "music"
+    ]
+  },
+  {
+    "memory": "I manage my two-factor authentication through Duo Security.",
+    "type": "preference",
+    "tags": [
+      "Duo Security",
+      "authentication"
+    ]
+  },
+  {
+    "memory": "I organize shared files on Google Drive for easy access.",
+    "type": "preference",
+    "tags": [
+      "Google Drive",
+      "files",
+      "organization"
+    ]
+  },
+  {
+    "memory": "I have an interest in royalty-free music and audio tracks.",
+    "type": "preference",
+    "tags": [
+      "Envato",
+      "music",
+      "audio"
+    ]
+  },
+  {
+    "memory": "39.0% of my browsing is educational-related.",
+    "type": "biographical",
+    "tags": [
+      "browsing",
+      "education"
+    ]
+  },
+  {
+    "memory": "5.3% of my browsing is creative-related.",
+    "type": "biographical",
+    "tags": [
+      "browsing",
+      "creativity"
+    ]
+  },
+  {
+    "memory": "1.0% of my browsing is social-related.",
+    "type": "biographical",
+    "tags": [
+      "browsing",
+      "social interaction"
+    ]
+  },
+  {
+    "memory": "39.7% of my browsing is entertainment-related.",
+    "type": "biographical",
+    "tags": [
+      "browsing",
+      "entertainment"
+    ]
+  },
+  {
+    "memory": "15.0% of my browsing is professional-related.",
+    "type": "biographical",
+    "tags": [
+      "browsing",
+      "professional"
+    ]
+  },
+  {
+    "memory": "I studied and researched the sources for my academic project.",
+    "type": "skill",
+    "tags": [
+      "academic",
+      "research"
+    ]
+  },
+  {
+    "memory": "My academic project title is New_Media_Art.pdf.",
+    "type": "biographical",
+    "tags": [
+      "academic",
+      "project"
+    ]
+  },
+  {
+    "memory": "I worked on an academic project titled 'Paul-CriticalThinking-StudentCopy.pdf'.",
+    "type": "event",
+    "tags": [
+      "academic",
+      "project",
+      "critical thinking"
+    ]
+  },
+  {
+    "memory": "I studied and researched various sources for my academic project.",
+    "type": "skill",
+    "tags": [
+      "research",
+      "analysis",
+      "academic"
+    ]
+  },
+  {
+    "memory": "I studied and researched sources for my academic project titled Passing.pdf.",
+    "type": "event",
+    "tags": [
+      "academic project",
+      "research",
+      "study"
+    ]
+  },
+  {
+    "memory": "I studied and researched sources for my academic project.",
+    "type": "skill",
+    "tags": [
+      "research",
+      "academic project"
+    ]
+  },
+  {
+    "memory": "My academic project is titled 'benjamin.pdf'.",
+    "type": "biographical",
+    "tags": [
+      "project title",
+      "academic"
+    ]
+  },
+  {
+    "memory": "My academic project title is butler_performative_acts.pdf.",
+    "type": "biographical",
+    "tags": [
+      "academic",
+      "project"
+    ]
+  },
+  {
+    "memory": "I often watch YouTube videos late at night.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "viewing habits",
+      "night owl"
+    ]
+  },
+  {
+    "memory": "I frequently watch YouTube around 1 PM.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "viewing habits",
+      "afternoon"
+    ]
+  },
+  {
+    "memory": "I enjoy watching videos in the evening hours.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "viewing habits",
+      "evening"
+    ]
+  },
+  {
+    "memory": "I tend to watch YouTube shortly before midnight.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "viewing habits",
+      "late night"
+    ]
+  },
+  {
+    "memory": "I usually find myself watching YouTube around 5 PM.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "viewing habits",
+      "evening"
+    ]
+  },
+  {
+    "memory": "I prefer to use Gmail for my email.",
+    "type": "preference",
+    "tags": [
+      "email",
+      "Gmail"
+    ]
+  },
+  {
+    "memory": "I bookmark content related to AI tools.",
+    "type": "preference",
+    "tags": [
+      "bookmarking",
+      "AI tools"
+    ]
+  },
+  {
+    "memory": "I have an interest in animation software.",
+    "type": "preference",
+    "tags": [
+      "animation",
+      "software"
+    ]
+  },
+  {
+    "memory": "I use YouTube to MP3 converters.",
+    "type": "preference",
+    "tags": [
+      "YouTube",
+      "conversion"
+    ]
+  },
+  {
+    "memory": "I utilize Microsoft Office for my work.",
+    "type": "preference",
+    "tags": [
+      "Microsoft Office",
+      "work"
+    ]
+  },
+  {
+    "memory": "I have bookmarked resources about interoception and interpersonal senses.",
+    "type": "preference",
+    "tags": [
+      "interoception",
+      "resources"
+    ]
+  },
+  {
+    "memory": "I am a resident at the Augmentation Lab.",
+    "type": "biographical",
+    "tags": [
+      "residency",
+      "Augmentation Lab"
+    ]
+  },
+  {
+    "memory": "I am interested in tools for enhancing my academic performance.",
+    "type": "preference",
+    "tags": [
+      "academic performance",
+      "tools"
+    ]
+  },
+  {
+    "memory": "I use Adobe Acrobat for PDF-related tasks.",
+    "type": "preference",
+    "tags": [
+      "PDF",
+      "Adobe Acrobat"
+    ]
+  },
+  {
+    "memory": "I have bookmarked content related to music AI.",
+    "type": "preference",
+    "tags": [
+      "music",
+      "AI"
+    ]
+  },
+  {
+    "memory": "I have a preference for Goosebumps merchandise, particularly Tim Jacobus limited edition prints.",
+    "type": "preference",
+    "tags": [
+      "Goosebumps",
+      "Tim Jacobus",
+      "collectibles"
+    ]
+  },
+  {
+    "memory": "I have saved items related to part-time job opportunities.",
+    "type": "event",
+    "tags": [
+      "job search",
+      "part-time"
+    ]
+  },
+  {
+    "memory": "I am interested in working as a Night Auditor at Embassy Suites Savannah Historic District.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "hospitality"
+    ]
+  },
+  {
+    "memory": "I am interested in working as a cashier.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "retail"
+    ]
+  },
+  {
+    "memory": "I am interested in the Retail Sales Associate position at Nike Savannah.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "retail"
+    ]
+  },
+  {
+    "memory": "I am interested in working as a bartender.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "hospitality"
+    ]
+  },
+  {
+    "memory": "I am interested in part-time cashier positions.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "retail"
+    ]
+  },
+  {
+    "memory": "I am considering working as a babysitter or nanny.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "childcare"
+    ]
+  },
+  {
+    "memory": "I am interested in the Juicer Barista position.",
+    "type": "preference",
+    "tags": [
+      "job",
+      "food service"
+    ]
+  },
+  {
+    "memory": "I want to go to Qiao Lin Hotpot in Boston.",
+    "type": "preference",
+    "tags": [
+      "restaurant",
+      "hotpot",
+      "Boston"
+    ]
+  },
+  {
+    "memory": "I like visiting coffee shops like Andala Coffee House.",
+    "type": "preference",
+    "tags": [
+      "coffee",
+      "Andala Coffee House"
+    ]
+  },
+  {
+    "memory": "I enjoy bagels from Black Sheep Bagel Cafe.",
+    "type": "preference",
+    "tags": [
+      "bagels",
+      "Black Sheep Bagel Cafe"
+    ]
+  },
+  {
+    "memory": "I have parked at a location marked by a dropped pin.",
+    "type": "event",
+    "tags": [
+      "dropped pin",
+      "parking"
+    ]
+  },
+  {
+    "memory": "I want to stay at Hotel Vittoria.",
+    "type": "preference",
+    "tags": [
+      "hotel",
+      "Hotel Vittoria"
+    ]
+  },
+  {
+    "memory": "I like fancy street designer shopping at Gallo.",
+    "type": "preference",
+    "tags": [
+      "shopping",
+      "designer",
+      "Gallo"
+    ]
+  },
+  {
+    "memory": "I am looking for a good place to buy a gift for Anushka.",
+    "type": "preference",
+    "tags": [
+      "gifts",
+      "Anushka"
+    ]
+  },
+  {
+    "memory": "I am interested in services from Spectra PhotoVideo.",
+    "type": "preference",
+    "tags": [
+      "photography",
+      "Spectra PhotoVideo"
+    ]
+  },
+  {
+    "memory": "I enjoy the atmosphere at Bar Julian.",
+    "type": "preference",
+    "tags": [
+      "bar",
+      "Bar Julian"
+    ]
+  },
+  {
+    "memory": "I like dining at Kim Chi II Korean Restaurant.",
+    "type": "preference",
+    "tags": [
+      "Korean",
+      "restaurant",
+      "Kim Chi II"
+    ]
+  },
+  {
+    "memory": "I have marked a location at 420 Meinhard Rd.",
+    "type": "event",
+    "tags": [
+      "dropped pin",
+      "location"
+    ]
+  },
+  {
+    "memory": "I shop at Sally Beauty.",
+    "type": "preference",
+    "tags": [
+      "beauty",
+      "Sally Beauty"
+    ]
+  },
+  {
+    "memory": "I enjoy visiting Sandfly Market Place.",
+    "type": "preference",
+    "tags": [
+      "market",
+      "Sandfly Market Place"
+    ]
+  },
+  {
+    "memory": "I have been to Keller's Flea Market.",
+    "type": "event",
+    "tags": [
+      "flea market",
+      "Keller's Flea Market"
+    ]
+  },
+  {
+    "memory": "I participate in activities at St. Paul's activity center.",
+    "type": "event",
+    "tags": [
+      "activity center",
+      "St. Paul's"
+    ]
+  },
+  {
+    "memory": "I like seafood from Sorry Charlie's Oyster Bar.",
+    "type": "preference",
+    "tags": [
+      "seafood",
+      "Sorry Charlie's Oyster Bar"
+    ]
+  },
+  {
+    "memory": "I prefer gelato with deep containers and a firm consistency.",
+    "type": "preference",
+    "tags": [
+      "gelato",
+      "food",
+      "preference"
+    ]
+  },
+  {
+    "memory": "I like to visit places that have been established in the 1800s.",
+    "type": "preference",
+    "tags": [
+      "history",
+      "food",
+      "preference"
+    ]
+  },
+  {
+    "memory": "I enjoy Montanara fried pizza doughnuts.",
+    "type": "preference",
+    "tags": [
+      "food",
+      "snacks"
+    ]
+  },
+  {
+    "memory": "I visited Amsterdam for the first time in 2022.",
+    "type": "event",
+    "tags": [
+      "travel",
+      "Amsterdam",
+      "2022"
+    ]
+  },
+  {
+    "memory": "I had camped in Rabac during the summer break and made friends.",
+    "type": "event",
+    "tags": [
+      "camping",
+      "summer",
+      "friendship"
+    ]
+  },
+  {
+    "memory": "I am interested in visiting vintage and retro shops.",
+    "type": "preference",
+    "tags": [
+      "shopping",
+      "vintage",
+      "retro"
+    ]
+  },
+  {
+    "memory": "I enjoy visiting local grocery stores.",
+    "type": "preference",
+    "tags": [
+      "grocery",
+      "local"
+    ]
+  },
+  {
+    "memory": "I have a preference for places that offer fun activities like Planet Fun.",
+    "type": "preference",
+    "tags": [
+      "activities",
+      "fun",
+      "entertainment"
     ]
   }
 ]

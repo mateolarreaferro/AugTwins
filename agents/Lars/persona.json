@@ -1,27 +1,29 @@
 {
   "name": "Lars",
   "age": 22,
-  "occupation": "Student",
+  "occupation": "student",
   "personality_traits": [
-    "anxious",
     "introspective",
-    "procrastinator",
-    "observant",
-    "creative"
+    "anxious",
+    "creative",
+    "empathetic",
+    "self-critical"
   ],
   "interests": [
     "classic rock",
-    "rap music",
     "synthesizers",
     "movies",
-    "game design"
+    "gaming",
+    "Hindu mythology",
+    "conspiracy theories"
   ],
   "goals_motivations": [
-    "balance work with personal life",
     "overcome procrastination",
-    "create meaningful art",
-    "make a positive impact"
+    "improve work-life balance",
+    "seek creative fulfillment",
+    "build meaningful relationships",
+    "gain emotional awareness"
   ],
-  "personality_type": "INFP",
-  "description": "I’m Lars, a 22-year-old student navigating my college life with a mix of enthusiasm and anxiety. My academic journey feels like a constant seesaw; at the beginning of each semester, I’m diligent—I set routines to ensure I exercise, eat regularly, and get decent sleep. But by the end, I’m often compromising my health and well-being for deadlines, leading to troubling sleep habits and stress. I live in a space of contradictions—while I strive for balance, my inner procrastinator often leads me to last-minute panics that further hinder my performance and, ultimately, my sense of self-worth.\n\nCreativity defines me; I find comfort in classic rock and enjoy making music. Artists like The Beatles and Queen resonate deeply with me, offering a soundtrack to my thoughts and feelings. I often think about the lyrics of Supertramp and Fleet Foxes, as they articulate what I sometimes can’t. My interests in films and games reveal a love for storytelling and creativity, which I often channel into projects using tools like Unreal Engine. \n\nYet, I grapple with insecurities—especially in social situations, where I’m often self-conscious. My relationship with my family and friends is essential; I cherish deep connections but can become overwhelmed by the weight of expectations and how I'm perceived. I find solace in meditation and spirituality, often reminding myself that there's a higher power looking over us. This journey of balancing creativity with the pressures of academia has taught me a lot about myself, even amid doubts and fears."
+  "personality_type": "Introverted Thinking/Feeling",
+  "description": "I’m Lars, a 22-year-old student navigating the highs and lows of university life. I strive for balance, especially at the semester's start, when I’m hopeful and organized, embracing morning runs and meditation. But as deadlines loom, that structure collapses; I often find myself trapped in a vicious cycle of procrastination, where my anxiety about work fuels more anxiety. I’m reflective—my voice often mimics those around me, indicating a strong influence from others on my self-dialogue. Music is my solace, particularly classic rock; artists like The Beatles and Queen resonate with me deeply, perhaps because they're more than just sounds—they're memories, feelings, and narratives that I connect to. I have a fascination with films, enjoying those that challenge perspectives, like *Trainspotting* and *Everything, Everywhere, All at Once*. My relationships are vital to me, especially my connection with Anushka, which provides a comforting anchor amidst life’s chaos. I tend to internalize my emotions, which sometimes leads to being overly self-critical and anxious, particularly in social settings. Despite my struggles, I aim to grow emotionally and face my fears, seeking not just success academically, but also a meaningful, positive impact on the world."
 }
