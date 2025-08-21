@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -43,13 +44,6 @@ ENCODING = tiktoken.encoding_for_model(DEFAULT_MODEL)
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 
 # System prompts
-MEMORY_PROMPT_SYSTEM = (
-    "You are a knowledge engineer. Extract atomic factual memories about the speaker. "
-    "Each memory must be a single declarative sentence in FIRST PERSON (using 'I', 'my', 'me') about a stable fact, preference, skill, event, or belief. "
-    "Return ONLY a valid JSON array. Do not include markdown formatting, code blocks, or any text before/after the JSON. "
-    "Use this exact schema: "
-    "[{\"memory\": <string>, \"type\": <'biographical'|'preference'|'skill'|'belief'|'event'>, \"tags\": [<string>, ...]}]"
-)
 
 PERSONA_PROMPT = (
     "You are an expert biographer and psychologist. Based on the complete interview transcripts, "
@@ -193,28 +187,28 @@ def chat(client: OpenAI, model: str, messages: List[Dict[str, str]]) -> str:
         raise  # bubbled after retries
 
 
-def extract_memories_from_digital_footprint(client: OpenAI, model: str, footprint_dir: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Extract memories from digital footprint data with intelligent prioritization."""
-    all_memories: List[Dict[str, Any]] = []
+def process_digital_footprint_for_mem0(footprint_dir: Path) -> str:
+    """Process digital footprint data into text chunks for Mem0 to process."""
+    footprint_text_chunks = []
     
-    # Define processing priorities and handlers
+    # Define processing priorities
     priority_sources = [
-        ("Profile/Profile.json", "profile", extract_profile_memories),
-        ("Chrome/Settings.json", "settings", extract_settings_memories),
-        ("Chrome/Extensions.json", "extensions", extract_extensions_memories),
-        ("Chrome/History.json", "browsing", extract_browsing_memories),
-        ("NotebookLM/*/", "academic", extract_notebooklm_memories),
-        ("My Activity/Search/MyActivity.html", "search", extract_search_memories),
-        ("My Activity/YouTube/MyActivity.html", "youtube", extract_youtube_memories),
-        ("My Activity/Maps/MyActivity.html", "location", extract_location_memories),
-        ("Chrome/Bookmarks.html", "bookmarks", extract_bookmark_memories),
-        ("Saved/*.csv", "preferences", extract_saved_items_memories),
-        ("Maps/My labeled places/Labeled places.json", "places", extract_places_memories),
-        ("Maps (your places)/Reviews.json", "reviews", extract_reviews_memories),
-        ("Timeline/Settings.json", "timeline", extract_timeline_memories),
+        ("Profile/Profile.json", "profile", process_profile_data),
+        ("Chrome/Settings.json", "settings", process_settings_data),
+        ("Chrome/Extensions.json", "extensions", process_extensions_data),
+        ("Chrome/History.json", "browsing", process_browsing_data),
+        ("NotebookLM/*/", "academic", process_notebooklm_data),
+        ("My Activity/Search/MyActivity.html", "search", process_search_data),
+        ("My Activity/YouTube/MyActivity.html", "youtube", process_youtube_data),
+        ("My Activity/Maps/MyActivity.html", "location", process_location_data),
+        ("Chrome/Bookmarks.html", "bookmarks", process_bookmark_data),
+        ("Saved/*.csv", "preferences", process_saved_items_data),
+        ("Maps/My labeled places/Labeled places.json", "places", process_places_data),
+        ("Maps (your places)/Reviews.json", "reviews", process_reviews_data),
+        ("Timeline/Settings.json", "timeline", process_timeline_data),
     ]
     
-    for pattern, source_type, extractor in priority_sources:
+    for pattern, source_type, processor in priority_sources:
         try:
             if "*/" in pattern:  # Handle directory patterns like "NotebookLM/*/"
                 base_pattern = pattern.replace("*/", "")
@@ -228,17 +222,18 @@ def extract_memories_from_digital_footprint(client: OpenAI, model: str, footprin
             for file_path in files:
                 if file_path.exists():
                     logging.info(f"Processing {source_type}: {file_path.name}")
-                    source_memories = extractor(client, model, file_path, chunk_tokens)
-                    all_memories.extend(source_memories)
+                    processed_text = processor(file_path)
+                    if processed_text:
+                        footprint_text_chunks.append(f"[{source_type.upper()}]\n{processed_text}")
                     
         except Exception as e:
             logging.warning(f"Failed to process {source_type} from {pattern}: {e}")
     
-    return deduplicate_memories(all_memories)
+    return "\n\n".join(footprint_text_chunks)
 
 
-def extract_profile_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Extract memories from profile data."""
+def process_profile_data(file_path: Path) -> str:
+    """Process profile data into text for Mem0."""
     try:
         profile_data = json.loads(file_path.read_text(encoding="utf-8"))
         
@@ -250,22 +245,21 @@ def extract_profile_memories(client: OpenAI, model: str, file_path: Path, chunk_
         Gender: {profile_data.get('gender', {}).get('type', 'Unknown')}
         """
         
-        return extract_memories_from_text(client, model, profile_text, chunk_tokens, "biographical")
+        return profile_text.strip()
         
     except Exception as e:
-        logging.warning(f"Failed to extract profile memories: {e}")
-        return []
+        logging.warning(f"Failed to process profile data: {e}")
+        return ""
 
 
-def extract_browsing_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Extract memories from browsing history with intelligent analysis."""
+def process_browsing_data(file_path: Path) -> str:
+    """Process browsing history into text for Mem0."""
     try:
         history_data = json.loads(file_path.read_text(encoding="utf-8"))
         browser_history = history_data.get("Browser History", [])
         
-        # Analyze browsing patterns more deeply
+        # Analyze browsing patterns
         domain_analysis = {}
-        time_patterns = {}
         content_categories = {
             'educational': ['edu', 'coursera', 'khan', 'udemy', 'mit', 'stanford', 'scad', 'blackboard'],
             'creative': ['figma', 'adobe', 'behance', 'dribbble', 'unsplash', 'deviantart'],
@@ -278,20 +272,18 @@ def extract_browsing_memories(client: OpenAI, model: str, file_path: Path, chunk
         
         category_counts = {cat: 0 for cat in content_categories.keys()}
         
-        for entry in browser_history[:1000]:  # Analyze more entries
+        for entry in browser_history[:1000]:
             url = entry.get("url", "")
             title = entry.get("title", "")
             
             if url and title:
                 domain = url.split("//")[-1].split("/")[0]
                 
-                # Domain frequency analysis
                 if domain not in domain_analysis:
                     domain_analysis[domain] = {'count': 0, 'titles': set()}
                 domain_analysis[domain]['count'] += 1
-                domain_analysis[domain]['titles'].add(title[:100])  # Truncate long titles
+                domain_analysis[domain]['titles'].add(title[:100])
                 
-                # Categorize browsing behavior
                 domain_lower = domain.lower()
                 url_lower = url.lower()
                 title_lower = title.lower()
@@ -301,33 +293,28 @@ def extract_browsing_memories(client: OpenAI, model: str, file_path: Path, chunk
                         category_counts[category] += 1
                         break
         
-        # Create detailed browsing analysis
         browsing_insights = []
         
-        # Top domains with context
         top_domains = sorted(domain_analysis.items(), key=lambda x: x[1]['count'], reverse=True)[:15]
         for domain, info in top_domains:
             sample_titles = list(info['titles'])[:3]
-            browsing_insights.append(f"Frequently visits {domain} ({info['count']} times) for: {'; '.join(sample_titles)}")
+            browsing_insights.append(f"I frequently visit {domain} ({info['count']} times) for: {'; '.join(sample_titles)}")
         
-        # Category analysis
         total_categorized = sum(category_counts.values())
         if total_categorized > 0:
             for category, count in category_counts.items():
                 if count > 0:
                     percentage = (count / total_categorized) * 100
-                    browsing_insights.append(f"{percentage:.1f}% of browsing is {category}-related ({count} visits)")
+                    browsing_insights.append(f"{percentage:.1f}% of my browsing is {category}-related ({count} visits)")
         
-        browsing_text = "Detailed browsing behavior analysis:\n" + "\n".join(browsing_insights)
-        
-        return extract_memories_from_text(client, model, browsing_text, chunk_tokens, "preference")
+        return "\n".join(browsing_insights)
         
     except Exception as e:
-        logging.warning(f"Failed to extract browsing memories: {e}")
-        return []
+        logging.warning(f"Failed to process browsing data: {e}")
+        return ""
 
 
-def extract_search_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_search_data(file_path: Path) -> str:
     """Extract memories from search activity with enhanced parsing."""
     try:
         content = file_path.read_text(encoding="utf-8")
@@ -427,75 +414,67 @@ def extract_search_memories(client: OpenAI, model: str, file_path: Path, chunk_t
             insights.append(f"Sample search queries: {'; '.join(interesting_queries[:10])}")
         
         if insights:
-            search_text = "Enhanced search behavior analysis: " + "; ".join(insights)
-            return extract_memories_from_text(client, model, search_text, chunk_tokens, "preference")
+            return "; ".join(insights)
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract search memories: {e}")
-        return []
+        logging.warning(f"Failed to process search data: {e}")
+        return ""
 
 
-def extract_location_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Extract memories from location/maps activity."""
+def process_location_data(file_path: Path) -> str:
+    """Process location/maps activity into text for Mem0."""
     try:
         content = file_path.read_text(encoding="utf-8")
         
-        # Extract location-related content (simplified)
         import re
         location_pattern = r'location[^<]*'
         matches = re.findall(location_pattern, content, re.IGNORECASE)
         
         if matches:
-            location_text = "Location activity: " + "; ".join(matches[:50])
-            return extract_memories_from_text(client, model, location_text, chunk_tokens, "event")
+            return "My location activity: " + "; ".join(matches[:50])
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract location memories: {e}")
-        return []
+        logging.warning(f"Failed to process location data: {e}")
+        return ""
 
 
-def extract_bookmark_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Extract memories from bookmarks."""
+def process_bookmark_data(file_path: Path) -> str:
+    """Process bookmarks into text for Mem0."""
     try:
         content = file_path.read_text(encoding="utf-8")
         
-        # Simple bookmark title extraction
         import re
         bookmark_pattern = r'<A[^>]*>([^<]+)</A>'
         titles = re.findall(bookmark_pattern, content)
         
         if titles:
-            bookmark_text = "Bookmarked content: " + "; ".join(titles[:50])
-            return extract_memories_from_text(client, model, bookmark_text, chunk_tokens, "preference")
+            return "My bookmarked content: " + "; ".join(titles[:50])
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract bookmark memories: {e}")
-        return []
+        logging.warning(f"Failed to process bookmark data: {e}")
+        return ""
 
 
-def extract_saved_items_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Extract memories from saved items CSV files."""
+def process_saved_items_data(file_path: Path) -> str:
+    """Process saved items CSV files into text for Mem0."""
     try:
         content = file_path.read_text(encoding="utf-8")
         
-        # Simple CSV processing (first 100 lines)
         lines = content.split('\n')[:100]
-        saved_text = f"Saved items from {file_path.stem}: " + "; ".join(lines[1:21])  # Skip header
-        
-        return extract_memories_from_text(client, model, saved_text, chunk_tokens, "preference")
+        return f"My saved items from {file_path.stem}: " + "; ".join(lines[1:21])
         
     except Exception as e:
-        logging.warning(f"Failed to extract saved items memories: {e}")
-        return []
+        logging.warning(f"Failed to process saved items data: {e}")
+        return ""
 
 
-def extract_settings_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_settings_data(file_path: Path) -> str:
     """Extract memories from Chrome settings and preferences."""
     try:
         settings_data = json.loads(file_path.read_text(encoding="utf-8"))
@@ -547,15 +526,14 @@ def extract_settings_memories(client: OpenAI, model: str, file_path: Path, chunk
                 except:
                     pass
         
-        settings_text = "Browser settings and preferences analysis: " + "; ".join(insights)
-        return extract_memories_from_text(client, model, settings_text, chunk_tokens, "biographical")
+        return "My browser settings and preferences: " + "; ".join(insights)
         
     except Exception as e:
-        logging.warning(f"Failed to extract settings memories: {e}")
-        return []
+        logging.warning(f"Failed to process settings data: {e}")
+        return ""
 
 
-def extract_extensions_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_extensions_data(file_path: Path) -> str:
     """Extract memories from Chrome extensions showing tool preferences."""
     try:
         ext_data = json.loads(file_path.read_text(encoding="utf-8"))
@@ -586,17 +564,16 @@ def extract_extensions_memories(client: OpenAI, model: str, file_path: Path, chu
                 break
         
         if insights:
-            ext_text = "Browser extension usage patterns: " + "; ".join(insights)
-            return extract_memories_from_text(client, model, ext_text, chunk_tokens, "preference")
+            return "My browser extension usage: " + "; ".join(insights)
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract extensions memories: {e}")
-        return []
+        logging.warning(f"Failed to process extensions data: {e}")
+        return ""
 
 
-def extract_notebooklm_memories(client: OpenAI, model: str, dir_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_notebooklm_data(dir_path: Path) -> str:
     """Extract memories from NotebookLM projects showing academic interests."""
     try:
         all_memories = []
@@ -641,18 +618,16 @@ def extract_notebooklm_memories(client: OpenAI, model: str, dir_path: Path, chun
                     insights.append(f"Created study notes: {note_title}")
             
             if len(insights) > 1:  # Only if we found meaningful data
-                project_text = f"NotebookLM academic project analysis: {'; '.join(insights)}"
-                project_memories = extract_memories_from_text(client, model, project_text, chunk_tokens, "skill")
-                all_memories.extend(project_memories)
+                all_memories.append(f"NotebookLM academic project: {'; '.join(insights)}")
         
-        return all_memories
+        return "\n\n".join(all_memories)
         
     except Exception as e:
-        logging.warning(f"Failed to extract NotebookLM memories: {e}")
-        return []
+        logging.warning(f"Failed to process NotebookLM data: {e}")
+        return ""
 
 
-def extract_youtube_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_youtube_data(file_path: Path) -> str:
     """Extract memories from YouTube activity."""
     try:
         content = file_path.read_text(encoding="utf-8")
@@ -687,17 +662,16 @@ def extract_youtube_memories(client: OpenAI, model: str, file_path: Path, chunk_
             insights.append(f"YouTube search queries: {'; '.join(search_queries[:10])}")
         
         if insights:
-            youtube_text = "YouTube activity analysis: " + "; ".join(insights)
-            return extract_memories_from_text(client, model, youtube_text, chunk_tokens, "preference")
+            return "My YouTube activity: " + "; ".join(insights)
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract YouTube memories: {e}")
-        return []
+        logging.warning(f"Failed to process YouTube data: {e}")
+        return ""
 
 
-def extract_reviews_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_reviews_data(file_path: Path) -> str:
     """Extract memories from Google Maps reviews."""
     try:
         reviews_data = json.loads(file_path.read_text(encoding="utf-8"))
@@ -719,17 +693,16 @@ def extract_reviews_memories(client: OpenAI, model: str, file_path: Path, chunk_
                         insights.append(review_text)
         
         if insights:
-            reviews_text = "Google Maps reviews and opinions: " + "; ".join(insights)
-            return extract_memories_from_text(client, model, reviews_text, chunk_tokens, "preference")
+            return "My Google Maps reviews and opinions: " + "; ".join(insights)
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract reviews memories: {e}")
-        return []
+        logging.warning(f"Failed to process reviews data: {e}")
+        return ""
 
 
-def extract_timeline_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_timeline_data(file_path: Path) -> str:
     """Extract memories from timeline settings."""
     try:
         timeline_data = json.loads(file_path.read_text(encoding="utf-8"))
@@ -742,99 +715,33 @@ def extract_timeline_memories(client: OpenAI, model: str, file_path: Path, chunk
             insights.append("Shares web and app activity data")
         
         if insights:
-            timeline_text = "Digital privacy and tracking preferences: " + "; ".join(insights)
-            return extract_memories_from_text(client, model, timeline_text, chunk_tokens, "preference")
+            return "My digital privacy and tracking preferences: " + "; ".join(insights)
         
-        return []
+        return ""
         
     except Exception as e:
-        logging.warning(f"Failed to extract timeline memories: {e}")
-        return []
+        logging.warning(f"Failed to process timeline data: {e}")
+        return ""
 
 
-def extract_places_memories(client: OpenAI, model: str, file_path: Path, chunk_tokens: int) -> List[Dict[str, Any]]:
+def process_places_data(file_path: Path) -> str:
     """Extract memories from labeled places."""
     try:
         places_data = json.loads(file_path.read_text(encoding="utf-8"))
         
-        places_text = "Labeled places: "
+        places_text = "My labeled places: "
         if isinstance(places_data, list):
             place_names = [place.get("name", "") for place in places_data[:20]]
             places_text += "; ".join(filter(None, place_names))
         
-        return extract_memories_from_text(client, model, places_text, chunk_tokens, "preference")
+        return places_text
         
     except Exception as e:
-        logging.warning(f"Failed to extract places memories: {e}")
-        return []
+        logging.warning(f"Failed to process places data: {e}")
+        return ""
 
 
-def extract_memories_from_text(client: OpenAI, model: str, text: str, chunk_tokens: int, memory_type: str) -> List[Dict[str, Any]]:
-    """Helper to extract memories from processed text."""
-    chunks = chunk_text(text, chunk_tokens)
-    all_memories: List[Dict[str, Any]] = []
-    
-    for chunk in chunks:
-        raw = chat(
-            client,
-            model,
-            [
-                {"role": "system", "content": MEMORY_PROMPT_SYSTEM},
-                {"role": "user", "content": f"Extract memories from this {memory_type} data:\n{chunk}"},
-            ],
-        )
-        try:
-            cleaned_raw = clean_json_response(raw)
-            batch = json.loads(cleaned_raw)
-            if isinstance(batch, list):
-                all_memories.extend(batch)
-        except json.JSONDecodeError:
-            logging.warning("Failed to parse memories JSON; skipping batch.")
-    
-    return all_memories
-
-
-def deduplicate_memories(memories: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Deduplicate memories by content similarity."""
-    seen: set[str] = set()
-    unique: List[Dict[str, Any]] = []
-    
-    for m in memories:
-        text = str(m.get("memory", "")).strip()
-        key = re.sub(r"\s+", " ", text).lower()
-        if text and key not in seen:
-            seen.add(key)
-            unique.append(m)
-    
-    return unique
-
-
-def extract_memories(client: OpenAI, model: str, transcript: str, chunk_tokens: int) -> List[Dict[str, Any]]:
-    """Run the MEMORY prompt over transcript chunks and collect unique memories."""
-    chunks = chunk_text(transcript, chunk_tokens)
-    iterator = tqdm(chunks, desc="Interview Memories") if tqdm else chunks
-    all_memories: List[Dict[str, Any]] = []
-
-    for chunk in iterator:
-        raw = chat(
-            client,
-            model,
-            [
-                {"role": "system", "content": MEMORY_PROMPT_SYSTEM},
-                {"role": "user", "content": chunk},
-            ],
-        )
-        try:
-            cleaned_raw = clean_json_response(raw)
-            batch = json.loads(cleaned_raw)
-            if isinstance(batch, list):
-                all_memories.extend(batch)
-            else:
-                logging.warning("Unexpected memory JSON shape; skipping batch.")
-        except json.JSONDecodeError:
-            logging.warning("Failed to parse memories JSON; skipping batch.")
-
-    return deduplicate_memories(all_memories)
+# Note: Custom memory extraction has been removed in favor of Mem0's built-in memory generation
 
 
 def trim_to_token_limit(text: str, max_tokens: int) -> str:
@@ -854,11 +761,11 @@ def build_openai_client() -> OpenAI:
     return OpenAI(api_key=OPENAI_API_KEY)
 
 
-def upload_to_mem0(transcript: str, persona: Dict[str, Any], utterance: Dict[str, Any], user_id: str) -> bool:
+def upload_to_mem0(transcript: str, footprint_text: str, persona: Dict[str, Any], utterance: Dict[str, Any], user_id: str) -> bool:
     """Upload agent profile data to Mem0 memory system.
 
-    Instead of pre-extracted memories, send raw transcript chunks so Mem0 can
-    perform memory extraction.
+    Sends raw transcript and digital footprint chunks so Mem0 can
+    perform its own memory extraction and relationship building.
     """
     if not MEM0_AVAILABLE:
         logging.warning("Mem0 not available - skipping memory upload. Install with: pip install mem0ai")
@@ -880,21 +787,39 @@ def upload_to_mem0(transcript: str, persona: Dict[str, Any], utterance: Dict[str
 
         logging.info(f"Starting Mem0 upload for user '{user_id}'...")
 
-        chunks = chunk_text(transcript, DEFAULT_CHUNK_TOKENS)
-        for i, chunk in enumerate(chunks, 1):
-            metadata = {
-                "category": "conversation",
-                "source": "profile_generation",
-            }
-            try:
-                messages = [{"role": "user", "content": chunk}]
-                m.add(messages, user_id=user_id, metadata=metadata)
-                if i % 20 == 0:
-                    logging.info(f"📊 Progress: {i}/{len(chunks)} chunks uploaded")
-            except Exception as e:
-                logging.error(f"❌ Failed to add transcript chunk {i}: {e}")
-
-        logging.info(f"Uploaded {len(chunks)} transcript chunks to Mem0")
+        # Upload transcript chunks
+        if transcript:
+            chunks = chunk_text(transcript, DEFAULT_CHUNK_TOKENS)
+            for i, chunk in enumerate(chunks, 1):
+                metadata = {
+                    "category": "conversation",
+                    "source": "interview_transcript",
+                }
+                try:
+                    messages = [{"role": "user", "content": chunk}]
+                    m.add(messages, user_id=user_id, metadata=metadata)
+                    if i % 20 == 0:
+                        logging.info(f"📊 Progress: {i}/{len(chunks)} transcript chunks uploaded")
+                except Exception as e:
+                    logging.error(f"❌ Failed to add transcript chunk {i}: {e}")
+            logging.info(f"Uploaded {len(chunks)} transcript chunks to Mem0")
+        
+        # Upload digital footprint data
+        if footprint_text:
+            footprint_chunks = chunk_text(footprint_text, DEFAULT_CHUNK_TOKENS)
+            for i, chunk in enumerate(footprint_chunks, 1):
+                metadata = {
+                    "category": "digital_footprint",
+                    "source": "digital_footprint_analysis",
+                }
+                try:
+                    messages = [{"role": "user", "content": chunk}]
+                    m.add(messages, user_id=user_id, metadata=metadata)
+                    if i % 10 == 0:
+                        logging.info(f"📊 Progress: {i}/{len(footprint_chunks)} footprint chunks uploaded")
+                except Exception as e:
+                    logging.error(f"❌ Failed to add footprint chunk {i}: {e}")
+            logging.info(f"Uploaded {len(footprint_chunks)} digital footprint chunks to Mem0")
         
         # Upload persona information
         if persona.get("description"):
@@ -1035,6 +960,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:  # pragma: 
     parser.add_argument("--mem0-user-id", help="User ID for Mem0 upload (defaults to person name)")
     parser.add_argument("--verify-mem0", action="store_true", help="Verify what's stored in Mem0 for the user")
     parser.add_argument("--skip-footprint", action="store_true", help="Skip digital footprint processing")
+    parser.add_argument("--save-raw", action="store_true", help="Save raw transcript and footprint samples for debugging")
     return parser.parse_args(argv)
 
 
@@ -1071,27 +997,19 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
 
     client = build_openai_client()
 
-    # Step 1: Memories from interviews
-    interview_memories = extract_memories(client, args.model, full_transcript, args.max_tokens)
-    
-    # Step 1.5: Memories from digital footprint
-    footprint_memories = []
+    # Process digital footprint if available
+    footprint_text = ""
     if not args.skip_footprint:
         footprint_dir = project_root / "digital footprint" / args.person.lower()
         if footprint_dir.exists():
             logging.info(f"Processing digital footprint from {footprint_dir}")
-            footprint_memories = extract_memories_from_digital_footprint(
-                client, args.model, footprint_dir, args.max_tokens
-            )
-            logging.info(f"Extracted {len(footprint_memories)} memories from digital footprint")
+            footprint_text = process_digital_footprint_for_mem0(footprint_dir)
+            if footprint_text:
+                logging.info(f"Processed digital footprint data ({len(footprint_text)} characters)")
         else:
             logging.info(f"No digital footprint found at {footprint_dir}")
     else:
         logging.info("Skipping digital footprint processing (--skip-footprint flag)")
-    
-    # Combine all memories
-    memories = interview_memories + footprint_memories
-    logging.info(f"Total memories: {len(memories)} (interviews: {len(interview_memories)}, footprint: {len(footprint_memories)})")
 
     # Step 2: Persona description + personality type
     persona_prompt_with_name = PERSONA_PROMPT + f"\n\nIMPORTANT: The person being profiled is named '{args.person.title()}'. Make sure the 'name' field matches this exactly."
@@ -1126,14 +1044,13 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
         logging.warning("Utterance JSON malformed – embedding raw text as 'style_guide'.")
         utterance = {"style_guide": utterance_raw.strip(), "sample_phrases": []}
 
-    # ── Write separate artefacts to agents folder
+    # ── Write persona and utterance artefacts to agents folder
     agent_dir = project_root / "agents" / args.person.title()
     agent_dir.mkdir(parents=True, exist_ok=True)
 
-    mem_path = agent_dir / "memories.json"
-    mem_path.write_text(json.dumps(memories, indent=2, ensure_ascii=False))
-    logging.info("Memories written → %s", mem_path)
-
+    # Note: We no longer save memories.json as Mem0 handles memory storage
+    # Only save persona and utterance for agent configuration
+    
     persona_path = agent_dir / "persona.json"
     persona_path.write_text(json.dumps(persona, indent=2, ensure_ascii=False))
     logging.info("Persona written → %s", persona_path)
@@ -1141,12 +1058,23 @@ def main(argv: List[str] | None = None) -> None:  # pragma: no cover
     utter_path = agent_dir / "utterance.json"
     utter_path.write_text(json.dumps(utterance, indent=2, ensure_ascii=False))
     logging.info("Utterance guide written → %s", utter_path)
+    
+    # Optionally save raw data for backup/debugging
+    if args.save_raw:
+        raw_data = {
+            "transcript": full_transcript[:10000],  # Save first 10k chars as sample
+            "footprint_summary": footprint_text[:5000] if footprint_text else "",
+            "timestamp": time.time()
+        }
+        raw_path = agent_dir / "raw_data.json"
+        raw_path.write_text(json.dumps(raw_data, indent=2, ensure_ascii=False))
+        logging.info("Raw data sample saved → %s", raw_path)
 
     # Upload to Mem0 if requested
     if args.upload_mem0:
         user_id = args.mem0_user_id or args.person.lower()
         logging.info(f"Uploading profile to Mem0 for user: {user_id}")
-        success = upload_to_mem0(full_transcript, persona, utterance, user_id)
+        success = upload_to_mem0(full_transcript, footprint_text, persona, utterance, user_id)
         if success:
             logging.info("✅ Profile successfully uploaded to Mem0")
         else:
