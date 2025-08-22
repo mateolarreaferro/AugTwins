@@ -10,8 +10,11 @@ from datetime import datetime
 from pathlib import Path
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from threading import Thread
+from flask_sock import Sock
+import json
+import threading
+import time
+from collections import defaultdict
 
 # Agents
 from agents.Lars.lars import lars
@@ -20,28 +23,21 @@ AGENTS = {
     "lars": lars,
 }
 
-# Initialize Flask app with SocketIO
+# Initialize Flask app with WebSocket support
 app = Flask(__name__)
 CORS(app, 
      origins=["*"],
      allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
      methods=["GET", "POST", "OPTIONS"]
 )  # Enable CORS for Unreal Engine integration
-socketio = SocketIO(
-    app, 
-    cors_allowed_origins="*", 
-    async_mode='threading',
-    engineio_logger=False,
-    socketio_logger=False,
-    allow_upgrades=True,
-    transports=['websocket', 'polling']
-)
+sock = Sock(app)
 
 # Global state
 current_agent = lars
 conversation_history = []
 tts_manager = None  # Will be initialized when needed
-active_tts_jobs = {}  # Track active TTS streaming jobs
+active_connections = {}  # Track active WebSocket connections
+connection_flags = defaultdict(dict)  # Per-connection cancellation flags
 
 
 def load_agent(agent) -> None:
@@ -273,13 +269,12 @@ def unreal_tts():
         return jsonify({'error': 'No text provided'}), 400
     
     try:
-        # For Unreal Engine, we might want to return base64-encoded audio
-        # or provide a streaming endpoint URL
+        # For Unreal Engine, provide WebSocket endpoint URL
         return jsonify({
             'status': 'accepted',
             'text': text,
             'voice_id': voice_id,
-            'websocket_url': f'ws://{request.host}/socket.io/?EIO=4&transport=websocket',
+            'websocket_url': f'ws://{request.host}/ws',
             'sample_rate': 22050,
             'encoding': 'pcm_s16le',
             'channels': 1
@@ -287,41 +282,64 @@ def unreal_tts():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# WebSocket handlers for real-time TTS streaming
-@socketio.on('connect')
-def handle_connect():
-    """Handle WebSocket connection."""
-    print(f"[WebSocket] Client connected: {request.sid}")
-    # Send connection confirmation with server info for Unreal Engine
-    emit('connected', {
-        'status': 'connected', 
-        'sid': request.sid,
-        'server_info': {
-            'current_agent': current_agent.name,
-            'supported_formats': ['pcm_s16le'],
-            'sample_rate': 22050,
-            'channels': 1
-        }
-    })
+# WebSocket handler for real-time TTS streaming
+@sock.route('/ws')
+def websocket_handler(ws):
+    """Handle plain WebSocket connections for Unreal Engine."""
+    connection_id = id(ws)
+    active_connections[connection_id] = ws
+    connection_flags[connection_id]['cancelled'] = False
+    
+    print(f"[WebSocket] Client connected: {connection_id}")
+    
+    try:
+        while True:
+            # Receive message from client
+            message = ws.receive()
+            
+            if message is None:
+                break
+                
+            try:
+                data = json.loads(message)
+                message_type = data.get('type')
+                
+                if message_type == 'prompt':
+                    handle_websocket_prompt(ws, data, connection_id)
+                elif message_type == 'cancel':
+                    handle_websocket_cancel(ws, data, connection_id)
+                else:
+                    ws.send(json.dumps({
+                        'type': 'error',
+                        'error': f'Unknown message type: {message_type}'
+                    }))
+                    
+            except json.JSONDecodeError:
+                ws.send(json.dumps({
+                    'type': 'error',
+                    'error': 'Invalid JSON message'
+                }))
+                
+    except Exception as e:
+        print(f"[WebSocket] Error for client {connection_id}: {e}")
+    finally:
+        print(f"[WebSocket] Client disconnected: {connection_id}")
+        # Clean up connection
+        if connection_id in active_connections:
+            del active_connections[connection_id]
+        if connection_id in connection_flags:
+            del connection_flags[connection_id]
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    """Handle WebSocket disconnection."""
-    print(f"[WebSocket] Client disconnected: {request.sid}")
-    # Cancel any active TTS jobs for this client
-    if request.sid in active_tts_jobs:
-        job_id = active_tts_jobs[request.sid]
-        asyncio.run(cancel_tts_stream(job_id))
-        del active_tts_jobs[request.sid]
-
-@socketio.on('prompt')
-def handle_prompt(data):
+def handle_websocket_prompt(ws, data, connection_id):
     """Handle text prompt for TTS streaming."""
     global current_agent, tts_manager
     
     text = data.get('text', '').strip()
     if not text:
-        emit('error', {'error': 'No text provided'})
+        ws.send(json.dumps({
+            'type': 'error',
+            'error': 'No text provided'
+        }))
         return
     
     # Initialize TTS manager if needed
@@ -329,81 +347,99 @@ def handle_prompt(data):
         from core.tts_utils import get_tts_manager
         tts_manager = get_tts_manager()
     
-    # Get agent's voice ID from tts_voice_id attribute
-    voice_id = getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')  # Default to Rachel
+    # Get agent's voice ID
+    voice_id = getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')
+    job_id = data.get('id', f"job_{int(time.time() * 1000)}")
     
-    # Start streaming in a background thread
-    job_id = data.get('id', str(uuid4()))
-    active_tts_jobs[request.sid] = job_id
+    # Send audio_start JSON response
+    ws.send(json.dumps({
+        'type': 'audio_start',
+        'id': job_id,
+        'encoding': 'pcm_s16le',
+        'sample_rate': 22050,
+        'channels': 1
+    }))
     
     def stream_audio():
         """Stream audio in background thread."""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-        async def _stream():
-            try:
-                async for packet in tts_manager.stream_tts(text, voice_id, job_id):
-                    if packet['type'] == 'audio_start':
-                        # Send JSON metadata
-                        socketio.emit('audio_start', {
-                            'id': packet['id'],
-                            'encoding': packet['encoding'],
-                            'sample_rate': packet['sample_rate'],
-                            'channels': packet['channels']
-                        }, room=request.sid)
-                    elif packet['type'] == 'audio_data':
-                        # Send binary PCM data with explicit binary flag for Unreal Engine
-                        socketio.emit('audio_data', {
-                            'id': packet['id'],
-                            'data': packet['data'],  # Raw binary PCM data
-                            'chunk_index': packet.get('chunk_index', 0),
-                            'binary': True
-                        }, room=request.sid)
-                    elif packet['type'] == 'audio_end':
-                        # Send end signal
-                        socketio.emit('audio_end', {'id': packet['id']}, room=request.sid)
-            except Exception as e:
-                socketio.emit('error', {'error': str(e)}, room=request.sid)
-            finally:
-                if request.sid in active_tts_jobs:
-                    del active_tts_jobs[request.sid]
-        
-        loop.run_until_complete(_stream())
-        loop.close()
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def _stream():
+                try:
+                    chunk_index = 0
+                    async for packet in tts_manager.stream_tts(text, voice_id, job_id):
+                        # Check cancellation flag
+                        if connection_flags[connection_id].get('cancelled', False):
+                            break
+                            
+                        if packet['type'] == 'audio_data':
+                            # Send binary PCM frames (4.4KB chunks for 100ms at 22.05kHz)
+                            chunk_data = packet['data']
+                            chunk_size = 4410  # ~100ms at 22.05kHz mono 16-bit
+                            
+                            for i in range(0, len(chunk_data), chunk_size):
+                                if connection_flags[connection_id].get('cancelled', False):
+                                    break
+                                    
+                                chunk = chunk_data[i:i + chunk_size]
+                                if chunk and connection_id in active_connections:
+                                    try:
+                                        # Send raw binary PCM data
+                                        active_connections[connection_id].send(chunk, binary=True)
+                                        chunk_index += 1
+                                    except Exception as e:
+                                        print(f"[WebSocket] Error sending audio chunk: {e}")
+                                        break
+                    
+                    # Send audio_end JSON response
+                    if not connection_flags[connection_id].get('cancelled', False) and connection_id in active_connections:
+                        active_connections[connection_id].send(json.dumps({
+                            'type': 'audio_end',
+                            'id': job_id
+                        }))
+                        
+                except Exception as e:
+                    if connection_id in active_connections:
+                        active_connections[connection_id].send(json.dumps({
+                            'type': 'error',
+                            'error': str(e)
+                        }))
+            
+            loop.run_until_complete(_stream())
+            loop.close()
+            
+        except Exception as e:
+            print(f"[WebSocket] Stream error: {e}")
     
-    thread = Thread(target=stream_audio)
+    # Start streaming in background thread
+    thread = threading.Thread(target=stream_audio)
     thread.daemon = True
     thread.start()
 
-@socketio.on('cancel')
-def handle_cancel(data):
+def handle_websocket_cancel(ws, data, connection_id):
     """Handle cancellation of TTS streaming."""
-    global tts_manager
-    
     job_id = data.get('id')
-    if not job_id and request.sid in active_tts_jobs:
-        job_id = active_tts_jobs[request.sid]
     
-    if job_id and tts_manager:
-        asyncio.run(cancel_tts_stream(job_id))
-        emit('cancelled', {'id': job_id})
-
-async def cancel_tts_stream(job_id: str):
-    """Cancel a TTS streaming job."""
-    global tts_manager
-    if tts_manager:
-        await tts_manager.cancel_job(job_id)
+    # Set cancellation flag for this connection
+    connection_flags[connection_id]['cancelled'] = True
+    
+    # Send confirmation
+    ws.send(json.dumps({
+        'type': 'cancelled',
+        'id': job_id
+    }))
 
 if __name__ == "__main__":
-    from uuid import uuid4
-    
     # Initialize the default agent
     load_agent(current_agent)
     print(f"AugTwins Flask server starting with agent: {current_agent.name}")
     print("Debug interface available at: http://localhost:5000")
     print("API endpoints available for Unreal Engine integration")
-    print("WebSocket support enabled for real-time TTS streaming")
+    print("Plain WebSocket support enabled at: ws://localhost:5000/ws")
+    print("WebSocket protocol: plain WebSocket (not Socket.IO)")
+    print("Audio format: PCM 16-bit mono at 22.05kHz, 4.4KB chunks (100ms)")
     
-    # Run Flask app with SocketIO
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # Run Flask app with plain WebSocket support
+    app.run(host='0.0.0.0', port=5000, debug=True)
