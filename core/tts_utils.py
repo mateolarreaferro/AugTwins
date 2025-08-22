@@ -37,7 +37,7 @@ class ElevenLabsRealtimeSession:
         headers = {"xi-api-key": self.api_key}
         
         self.websocket = await websockets.connect(
-            url, extra_headers=headers, ping_interval=20, ping_timeout=10
+            url, additional_headers=headers, ping_interval=20, ping_timeout=10
         )
         await self._configure_session()
         self.is_connected = True
