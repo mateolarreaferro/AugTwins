@@ -45,7 +45,6 @@ class ElevenLabsRealtimeSession:
     async def _configure_session(self) -> None:
         """Configure the session for PCM S16LE output at 22.05 kHz."""
         config = {
-            "text": " ",
             "voice_settings": {
                 "stability": 0.55,
                 "similarity_boost": 0.8,
