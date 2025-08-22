@@ -84,6 +84,9 @@ class ElevenLabsRealtimeSession:
                         break
             except asyncio.TimeoutError:
                 break
+            except websockets.exceptions.ConnectionClosedOK:
+                # Normal WebSocket closure, not an error
+                break
             except Exception as e:
                 print(f"[TTS Stream Error] {e}")
                 break
