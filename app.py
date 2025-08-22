@@ -22,8 +22,20 @@ AGENTS = {
 
 # Initialize Flask app with SocketIO
 app = Flask(__name__)
-CORS(app)  # Enable CORS for Unreal Engine integration
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+CORS(app, 
+     origins=["*"],
+     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+     methods=["GET", "POST", "OPTIONS"]
+)  # Enable CORS for Unreal Engine integration
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*", 
+    async_mode='threading',
+    engineio_logger=False,
+    socketio_logger=False,
+    allow_upgrades=True,
+    transports=['websocket', 'polling']
+)
 
 # Global state
 current_agent = lars
@@ -248,12 +260,49 @@ def health_check():
         'timestamp': datetime.now().isoformat()
     })
 
+@app.route('/unreal/tts', methods=['POST'])
+def unreal_tts():
+    """Direct TTS endpoint for Unreal Engine (HTTP-based alternative)."""
+    global current_agent
+    
+    data = request.get_json()
+    text = data.get('text', '').strip()
+    voice_id = data.get('voice_id') or getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')
+    
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+    
+    try:
+        # For Unreal Engine, we might want to return base64-encoded audio
+        # or provide a streaming endpoint URL
+        return jsonify({
+            'status': 'accepted',
+            'text': text,
+            'voice_id': voice_id,
+            'websocket_url': f'ws://{request.host}/socket.io/?EIO=4&transport=websocket',
+            'sample_rate': 22050,
+            'encoding': 'pcm_s16le',
+            'channels': 1
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # WebSocket handlers for real-time TTS streaming
 @socketio.on('connect')
 def handle_connect():
     """Handle WebSocket connection."""
     print(f"[WebSocket] Client connected: {request.sid}")
-    emit('connected', {'status': 'connected', 'sid': request.sid})
+    # Send connection confirmation with server info for Unreal Engine
+    emit('connected', {
+        'status': 'connected', 
+        'sid': request.sid,
+        'server_info': {
+            'current_agent': current_agent.name,
+            'supported_formats': ['pcm_s16le'],
+            'sample_rate': 22050,
+            'channels': 1
+        }
+    })
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -304,8 +353,13 @@ def handle_prompt(data):
                             'channels': packet['channels']
                         }, room=request.sid)
                     elif packet['type'] == 'audio_data':
-                        # Send binary PCM data directly (not base64 encoded)
-                        socketio.emit('audio_data', packet['data'], room=request.sid)
+                        # Send binary PCM data with explicit binary flag for Unreal Engine
+                        socketio.emit('audio_data', {
+                            'id': packet['id'],
+                            'data': packet['data'],  # Raw binary PCM data
+                            'chunk_index': packet.get('chunk_index', 0),
+                            'binary': True
+                        }, room=request.sid)
                     elif packet['type'] == 'audio_end':
                         # Send end signal
                         socketio.emit('audio_end', {'id': packet['id']}, room=request.sid)
