@@ -400,7 +400,7 @@ def handle_websocket_prompt(ws, data, connection_id):
                                 if chunk and connection_id in active_connections:
                                     try:
                                         # Send raw binary PCM data
-                                        active_connections[connection_id].send(chunk, binary=True)
+                                        active_connections[connection_id].send(chunk)
                                         chunk_index += 1
                                     except Exception as e:
                                         print(f"[WebSocket] Error sending audio chunk: {e}")
