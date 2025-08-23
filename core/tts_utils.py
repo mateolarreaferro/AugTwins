@@ -86,11 +86,15 @@ class ElevenLabsRealtimeSession:
             
         message = {
             "text": text,
-            "try_trigger_generation": True,
-            "generation_config": {"chunk_length_schedule": [100]}
+            "try_trigger_generation": True
         }
         print(f"[TTS Debug] Sending text message: {text[:50]}...")
         await self.websocket.send(json.dumps(message))
+        
+        # Send end-of-input signal
+        end_message = {"text": ""}
+        print(f"[TTS Debug] Sending end-of-input signal...")
+        await self.websocket.send(json.dumps(end_message))
         
         chunk_count = 0
         while True:
