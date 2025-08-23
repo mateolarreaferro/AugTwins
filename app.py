@@ -271,6 +271,99 @@ def unreal_tts():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/tts/stream', methods=['POST'])
+def tts_stream():
+    """HTTP streaming TTS endpoint - optimized for lowest latency."""
+    global current_agent
+    
+    data = request.get_json()
+    text = data.get('text', '').strip()
+    voice_id = data.get('voice_id') or getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')
+    output_format = data.get('output_format', 'mp3_22050_32')  # Fast format
+    optimize_latency = data.get('optimize_streaming_latency', 4)  # Maximum optimization
+    
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+    
+    try:
+        from core.tts_utils import get_http_tts_client
+        from flask import Response
+        
+        client = get_http_tts_client()
+        
+        def generate_audio():
+            """Stream audio chunks as they're received."""
+            try:
+                for chunk in client.synthesize_streaming(
+                    text=text,
+                    voice_id=voice_id,
+                    output_format=output_format,
+                    optimize_streaming_latency=optimize_latency
+                ):
+                    yield chunk
+            except Exception as e:
+                print(f"[HTTP TTS Stream Error] {e}")
+                # Return empty bytes on error
+                yield b''
+        
+        # Return streaming response with proper headers
+        response = Response(
+            generate_audio(),
+            mimetype='audio/mpeg' if 'mp3' in output_format else 'audio/pcm',
+            headers={
+                'Cache-Control': 'no-cache',
+                'X-Voice-ID': voice_id,
+                'X-Text-Length': str(len(text)),
+                'X-Format': output_format
+            }
+        )
+        
+        return response
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/tts/complete', methods=['POST'])
+def tts_complete():
+    """HTTP complete TTS endpoint - best for short texts."""
+    global current_agent
+    
+    data = request.get_json()
+    text = data.get('text', '').strip()
+    voice_id = data.get('voice_id') or getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')
+    output_format = data.get('output_format', 'mp3_22050_32')
+    
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+    
+    try:
+        from core.tts_utils import get_http_tts_client
+        from flask import Response
+        
+        client = get_http_tts_client()
+        audio_data = client.synthesize_complete(
+            text=text,
+            voice_id=voice_id,
+            output_format=output_format
+        )
+        
+        response = Response(
+            audio_data,
+            mimetype='audio/mpeg' if 'mp3' in output_format else 'audio/pcm',
+            headers={
+                'Content-Length': str(len(audio_data)),
+                'Cache-Control': 'no-cache',
+                'X-Voice-ID': voice_id,
+                'X-Text-Length': str(len(text)),
+                'X-Format': output_format
+            }
+        )
+        
+        return response
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # WebSocket handler for real-time TTS streaming
 @sock.route('/ws')
 def websocket_handler(ws):
@@ -424,4 +517,4 @@ if __name__ == "__main__":
     print("Debug interface available at: http://localhost:5000")
     
     # Run Flask app with plain WebSocket support
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

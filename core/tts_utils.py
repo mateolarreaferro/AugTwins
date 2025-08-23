@@ -15,7 +15,8 @@ try:
 except ModuleNotFoundError:  # allow tests without requests
     requests = None
 from uuid import uuid4
-from typing import Optional, AsyncGenerator, Dict, Any
+from typing import Optional, AsyncGenerator, Dict, Any, Iterator
+import io
 
 # API key - load from centralized config
 from config import ELEVEN_API_KEY
@@ -247,8 +248,113 @@ class RealtimeTTSManager:
         self.active_jobs.clear()
 
 
-# Global TTS manager instance
+class HTTPTTSClient:
+    """Fast HTTP-based TTS client optimized for low latency."""
+    
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or ELEVEN_API_KEY
+        self.session = None
+        if requests:
+            self.session = requests.Session()
+            # Optimize session for speed
+            self.session.headers.update({
+                'xi-api-key': self.api_key,
+                'Content-Type': 'application/json',
+                'Accept': 'audio/mpeg'
+            })
+            # Keep connections alive for better performance
+            adapter = requests.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=20)
+            self.session.mount('https://', adapter)
+    
+    def synthesize_streaming(self, text: str, voice_id: str, 
+                           output_format: str = "mp3_22050_32",
+                           optimize_streaming_latency: int = 4,
+                           stability: float = 0.55,
+                           similarity_boost: float = 0.8,
+                           style: float = 0.0,
+                           use_speaker_boost: bool = True) -> Iterator[bytes]:
+        """
+        Synthesize speech with streaming for lowest latency.
+        
+        Args:
+            text: Text to synthesize
+            voice_id: ElevenLabs voice ID
+            output_format: Audio format (mp3_22050_32 for speed, pcm_22050 for quality)
+            optimize_streaming_latency: 0-4, higher = lower latency
+            stability: Voice stability (0-1)
+            similarity_boost: Voice similarity (0-1) 
+            style: Voice style (0-1)
+            use_speaker_boost: Enable speaker boost for clarity
+        """
+        if not self.session or not requests:
+            raise RuntimeError("requests library not available or session not initialized")
+        
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
+        
+        payload = {
+            "text": text,
+            "voice_settings": {
+                "stability": stability,
+                "similarity_boost": similarity_boost,
+                "style": style,
+                "use_speaker_boost": use_speaker_boost
+            },
+            "output_format": output_format,
+            "optimize_streaming_latency": optimize_streaming_latency
+        }
+        
+        try:
+            with self.session.post(url, json=payload, stream=True, timeout=(5, 30)) as response:
+                response.raise_for_status()
+                
+                # Stream audio chunks as they arrive
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        yield chunk
+                        
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"TTS HTTP request failed: {e}")
+    
+    def synthesize_complete(self, text: str, voice_id: str,
+                          output_format: str = "mp3_22050_32",
+                          stability: float = 0.55,
+                          similarity_boost: float = 0.8) -> bytes:
+        """
+        Synthesize complete audio file (non-streaming).
+        Faster for short texts, but higher latency for long texts.
+        """
+        if not self.session or not requests:
+            raise RuntimeError("requests library not available or session not initialized")
+        
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+        
+        payload = {
+            "text": text,
+            "voice_settings": {
+                "stability": stability,
+                "similarity_boost": similarity_boost
+            },
+            "output_format": output_format
+        }
+        
+        try:
+            response = self.session.post(url, json=payload, timeout=30)
+            response.raise_for_status()
+            return response.content
+            
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"TTS HTTP request failed: {e}")
+    
+    def close(self):
+        """Close the HTTP session."""
+        if self.session:
+            self.session.close()
+            self.session = None
+
+
+# Global TTS instances
 _tts_manager = None
+_http_tts_client = None
 
 def get_tts_manager() -> RealtimeTTSManager:
     """Get the global TTS manager instance."""
@@ -256,6 +362,13 @@ def get_tts_manager() -> RealtimeTTSManager:
     if _tts_manager is None:
         _tts_manager = RealtimeTTSManager()
     return _tts_manager
+
+def get_http_tts_client() -> HTTPTTSClient:
+    """Get the global HTTP TTS client instance."""
+    global _http_tts_client
+    if _http_tts_client is None:
+        _http_tts_client = HTTPTTSClient()
+    return _http_tts_client
 
 
 # Legacy synchronous helper (backward compatibility)
