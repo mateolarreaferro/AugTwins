@@ -35,7 +35,7 @@ class ElevenLabsRealtimeSession:
             print(f"[TTS Debug] Already connected to voice {self.voice_id}")
             return
             
-        url = f"wss://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}/stream-input"
+        url = f"wss://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}/stream-input?output_format=pcm_22050"
         headers = {"xi-api-key": self.api_key}
         
         print(f"[TTS Debug] Connecting to {url} with voice {self.voice_id}")
@@ -54,14 +54,13 @@ class ElevenLabsRealtimeSession:
     async def _configure_session(self) -> None:
         """Configure the session for PCM S16LE output at 22.05 kHz."""
         config = {
+            "text": " ",
             "voice_settings": {
+                "speed": 1,
                 "stability": 0.55,
-                "similarity_boost": 0.8,
-                "use_speaker_boost": True
+                "similarity_boost": 0.8
             },
-            "generation_config": {"chunk_length_schedule": [100]},
-            "xi_api_key": self.api_key,
-            "output_format": "pcm_22050"
+            "xi_api_key": self.api_key
         }
         print(f"[TTS Debug] Sending config: {json.dumps(config, indent=2)}")
         await self.websocket.send(json.dumps(config))
