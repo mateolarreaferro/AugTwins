@@ -300,15 +300,18 @@ def websocket_handler(ws):
             if message is None:
                 break
                 
+            print(f"[WebSocket] Received message from client {connection_id}: {message}")
             try:
                 data = json.loads(message)
                 message_type = data.get('type')
+                print(f"[WebSocket] Message type: '{message_type}' from client {connection_id}")
                 
                 if message_type == 'prompt':
                     handle_websocket_prompt(ws, data, connection_id)
                 elif message_type == 'cancel':
                     handle_websocket_cancel(ws, data, connection_id)
                 else:
+                    print(f"[WebSocket] Unknown message type '{message_type}' from client {connection_id}")
                     ws.send(json.dumps({
                         'type': 'error',
                         'error': f'Unknown message type: {message_type}'
@@ -334,8 +337,14 @@ def handle_websocket_prompt(ws, data, connection_id):
     """Handle text prompt for TTS streaming."""
     global current_agent, tts_manager
     
+    print(f"[WebSocket TTS] Received prompt request from client {connection_id}")
+    print(f"[WebSocket TTS] Data received: {data}")
+    
     text = data.get('text', '').strip()
+    print(f"[WebSocket TTS] Extracted text: '{text}' (length: {len(text)})")
+    
     if not text:
+        print(f"[WebSocket TTS] No text provided, sending error")
         ws.send(json.dumps({
             'type': 'error',
             'error': 'No text provided'
@@ -344,12 +353,16 @@ def handle_websocket_prompt(ws, data, connection_id):
     
     # Initialize TTS manager if needed
     if tts_manager is None:
+        print(f"[WebSocket TTS] Initializing TTS manager")
         from core.tts_utils import get_tts_manager
         tts_manager = get_tts_manager()
     
     # Get agent's voice ID
     voice_id = getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')
     job_id = data.get('id', f"job_{int(time.time() * 1000)}")
+    
+    print(f"[WebSocket TTS] Using voice_id: {voice_id}, job_id: {job_id}")
+    print(f"[WebSocket TTS] Starting TTS processing for: '{text[:50]}{'...' if len(text) > 50 else ''}'")
     
     # Send audio_start JSON response
     ws.send(json.dumps({
