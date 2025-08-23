@@ -4,8 +4,6 @@ import os
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 import json
-import asyncio
-import base64
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, request, jsonify, render_template
@@ -164,19 +162,10 @@ def chat():
         }
         conversation_history.append(conversation_entry)
         
-        # Text-to-speech (optional)
-        audio_enabled = False
-        try:
-            current_agent.speak(reply)
-            audio_enabled = True
-        except Exception as e:
-            print(f"TTS failed: {e}")
-        
         return jsonify({
             'response': reply,
             'agent': current_agent.name,
-            'timestamp': conversation_entry['timestamp'],
-            'audio_enabled': audio_enabled
+            'timestamp': conversation_entry['timestamp']
         })
         
     except Exception as e:
@@ -337,11 +326,7 @@ def handle_websocket_prompt(ws, data, connection_id):
     """Handle text prompt for TTS streaming."""
     global current_agent, tts_manager
     
-    print(f"[WebSocket TTS] Received prompt request from client {connection_id}")
-    print(f"[WebSocket TTS] Data received: {data}")
-    
     text = data.get('text', '').strip()
-    print(f"[WebSocket TTS] Extracted text: '{text}' (length: {len(text)})")
     
     if not text:
         print(f"[WebSocket TTS] No text provided, sending error")
@@ -361,8 +346,6 @@ def handle_websocket_prompt(ws, data, connection_id):
     voice_id = getattr(current_agent, 'tts_voice_id', '21m00Tcm4TlvDq8ikWAM')
     job_id = data.get('id', f"job_{int(time.time() * 1000)}")
     
-    print(f"[WebSocket TTS] Using voice_id: {voice_id}, job_id: {job_id}")
-    print(f"[WebSocket TTS] Starting TTS processing for: '{text[:50]}{'...' if len(text) > 50 else ''}'")
     
     # Send audio_start JSON response
     ws.send(json.dumps({
@@ -376,55 +359,45 @@ def handle_websocket_prompt(ws, data, connection_id):
     def stream_audio():
         """Stream audio in background thread."""
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            
-            async def _stream():
-                try:
-                    chunk_index = 0
-                    async for packet in tts_manager.stream_tts(text, voice_id, job_id):
-                        # Check cancellation flag
+            chunk_index = 0
+            for packet in tts_manager.stream_tts_sync(text, voice_id, job_id):
+                # Check cancellation flag
+                if connection_flags[connection_id].get('cancelled', False):
+                    break
+                    
+                if packet['type'] == 'audio_data':
+                    # Send binary PCM frames (4.4KB chunks for 100ms at 22.05kHz)
+                    chunk_data = packet['data']
+                    chunk_size = 4410  # ~100ms at 22.05kHz mono 16-bit
+                    
+                    for i in range(0, len(chunk_data), chunk_size):
                         if connection_flags[connection_id].get('cancelled', False):
                             break
                             
-                        if packet['type'] == 'audio_data':
-                            # Send binary PCM frames (4.4KB chunks for 100ms at 22.05kHz)
-                            chunk_data = packet['data']
-                            chunk_size = 4410  # ~100ms at 22.05kHz mono 16-bit
-                            
-                            for i in range(0, len(chunk_data), chunk_size):
-                                if connection_flags[connection_id].get('cancelled', False):
-                                    break
-                                    
-                                chunk = chunk_data[i:i + chunk_size]
-                                if chunk and connection_id in active_connections:
-                                    try:
-                                        # Send raw binary PCM data
-                                        active_connections[connection_id].send(chunk)
-                                        chunk_index += 1
-                                    except Exception as e:
-                                        print(f"[WebSocket] Error sending audio chunk: {e}")
-                                        break
-                    
-                    # Send audio_end JSON response
-                    if not connection_flags[connection_id].get('cancelled', False) and connection_id in active_connections:
-                        active_connections[connection_id].send(json.dumps({
-                            'type': 'audio_end',
-                            'id': job_id
-                        }))
-                        
-                except Exception as e:
-                    if connection_id in active_connections:
-                        active_connections[connection_id].send(json.dumps({
-                            'type': 'error',
-                            'error': str(e)
-                        }))
+                        chunk = chunk_data[i:i + chunk_size]
+                        if chunk and connection_id in active_connections:
+                            try:
+                                # Send raw binary PCM data
+                                active_connections[connection_id].send(chunk)
+                                chunk_index += 1
+                            except Exception as e:
+                                print(f"[WebSocket] Error sending audio chunk: {e}")
+                                break
             
-            loop.run_until_complete(_stream())
-            loop.close()
-            
+            # Send audio_end JSON response
+            if not connection_flags[connection_id].get('cancelled', False) and connection_id in active_connections:
+                active_connections[connection_id].send(json.dumps({
+                    'type': 'audio_end',
+                    'id': job_id
+                }))
+                
         except Exception as e:
             print(f"[WebSocket] Stream error: {e}")
+            if connection_id in active_connections:
+                active_connections[connection_id].send(json.dumps({
+                    'type': 'error',
+                    'error': str(e)
+                }))
     
     # Start streaming in background thread
     thread = threading.Thread(target=stream_audio)
@@ -449,10 +422,6 @@ if __name__ == "__main__":
     load_agent(current_agent)
     print(f"AugTwins Flask server starting with agent: {current_agent.name}")
     print("Debug interface available at: http://localhost:5000")
-    print("API endpoints available for Unreal Engine integration")
-    print("Plain WebSocket support enabled at: ws://localhost:5000/ws")
-    print("WebSocket protocol: plain WebSocket (not Socket.IO)")
-    print("Audio format: PCM 16-bit mono at 22.05kHz, 4.4KB chunks (100ms)")
     
     # Run Flask app with plain WebSocket support
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

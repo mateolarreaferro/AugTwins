@@ -5,7 +5,12 @@ class ChatInterface {
         this.currentAgentSpan = document.getElementById('currentAgent');
         this.placeholder = this.chatContainer.querySelector('.chat-placeholder');
         
+        this.audioContext = null;
+        this.websocket = null;
+        this.isPlayingAudio = false;
+        
         this.initializeEventListeners();
+        this.initializeAudio();
     }
     
     initializeEventListeners() {
@@ -14,6 +19,170 @@ class ChatInterface {
         
         // Auto-resize input based on content
         this.messageInput.addEventListener('input', this.autoResizeInput.bind(this));
+    }
+    
+    async initializeAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                sampleRate: 22050
+            });
+        } catch (error) {
+            console.warn('Audio not available:', error);
+        }
+    }
+    
+    connectWebSocket() {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            return this.websocket;
+        }
+        
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws`;
+        
+        this.websocket = new WebSocket(wsUrl);
+        this.websocket.binaryType = 'arraybuffer';
+        
+        this.websocket.onopen = () => {
+            console.log('[Debug TTS] WebSocket connected');
+        };
+        
+        this.websocket.onerror = (error) => {
+            console.error('[Debug TTS] WebSocket error:', error);
+        };
+        
+        this.websocket.onclose = () => {
+            console.log('[Debug TTS] WebSocket closed');
+            this.websocket = null;
+        };
+        
+        return this.websocket;
+    }
+    
+    async playTTSAudio(text) {
+        if (!this.audioContext || this.isPlayingAudio) {
+            console.log('[Debug TTS] Audio context unavailable or already playing');
+            return;
+        }
+        
+        try {
+            // Resume audio context if suspended (browser autoplay policy)
+            if (this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+            }
+            
+            const ws = this.connectWebSocket();
+            if (ws.readyState !== WebSocket.OPEN) {
+                // Wait for connection
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => reject(new Error('WebSocket connection timeout')), 5000);
+                    ws.onopen = () => {
+                        clearTimeout(timeout);
+                        resolve();
+                    };
+                    ws.onerror = () => {
+                        clearTimeout(timeout);
+                        reject(new Error('WebSocket connection failed'));
+                    };
+                });
+            }
+            
+            this.isPlayingAudio = true;
+            this.addSystemMessage('🔊 Playing audio response...');
+            
+            // Send TTS request
+            const jobId = `debug_${Date.now()}`;
+            ws.send(JSON.stringify({
+                type: 'prompt',
+                text: text,
+                id: jobId
+            }));
+            
+            // Handle WebSocket messages
+            const audioChunks = [];
+            let audioStarted = false;
+            
+            const handleMessage = async (event) => {
+                if (event.data instanceof ArrayBuffer) {
+                    // Binary PCM audio data
+                    if (audioStarted) {
+                        audioChunks.push(new Uint8Array(event.data));
+                    }
+                } else {
+                    // JSON message
+                    try {
+                        const message = JSON.parse(event.data);
+                        
+                        if (message.type === 'audio_start' && message.id === jobId) {
+                            console.log('[Debug TTS] Audio stream started');
+                            audioStarted = true;
+                        } else if (message.type === 'audio_end' && message.id === jobId) {
+                            console.log('[Debug TTS] Audio stream ended, playing audio');
+                            ws.removeEventListener('message', handleMessage);
+                            
+                            // Convert and play audio
+                            if (audioChunks.length > 0) {
+                                await this.playPCMAudio(audioChunks);
+                            }
+                            
+                            this.isPlayingAudio = false;
+                        } else if (message.type === 'error') {
+                            console.error('[Debug TTS] Error:', message.error);
+                            ws.removeEventListener('message', handleMessage);
+                            this.addSystemMessage(`🔊 Audio error: ${message.error}`);
+                            this.isPlayingAudio = false;
+                        }
+                    } catch (e) {
+                        console.error('[Debug TTS] Failed to parse message:', e);
+                    }
+                }
+            };
+            
+            ws.addEventListener('message', handleMessage);
+            
+        } catch (error) {
+            console.error('[Debug TTS] Failed to play audio:', error);
+            this.addSystemMessage(`🔊 Audio failed: ${error.message}`);
+            this.isPlayingAudio = false;
+        }
+    }
+    
+    async playPCMAudio(chunks) {
+        try {
+            // Combine all chunks
+            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+            const combinedData = new Uint8Array(totalLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+                combinedData.set(chunk, offset);
+                offset += chunk.length;
+            }
+            
+            // Convert PCM S16LE to Float32Array
+            const samples = new Float32Array(combinedData.length / 2);
+            const dataView = new DataView(combinedData.buffer);
+            
+            for (let i = 0; i < samples.length; i++) {
+                // Read 16-bit signed integer (little-endian) and convert to float
+                const int16 = dataView.getInt16(i * 2, true);
+                samples[i] = int16 / 32768.0; // Convert to -1.0 to 1.0 range
+            }
+            
+            // Create audio buffer
+            const audioBuffer = this.audioContext.createBuffer(1, samples.length, 22050);
+            audioBuffer.getChannelData(0).set(samples);
+            
+            // Play audio
+            const source = this.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(this.audioContext.destination);
+            source.start();
+            
+            console.log(`[Debug TTS] Playing ${samples.length} samples (${(samples.length / 22050).toFixed(2)}s)`);
+            
+        } catch (error) {
+            console.error('[Debug TTS] Failed to play PCM audio:', error);
+            throw error;
+        }
     }
     
     autoResizeInput() {
@@ -115,8 +284,9 @@ class ChatInterface {
             if (response.ok) {
                 this.addMessage(data.agent, data.response);
                 
-                if (data.audio_enabled) {
-                    this.addSystemMessage('Playing audio response...');
+                // Use WebSocket-based TTS for lower latency
+                if (data.response && this.audioContext) {
+                    this.playTTSAudio(data.response);
                 }
             } else {
                 this.addSystemMessage(`Error: ${data.error || 'Unknown error'}`);

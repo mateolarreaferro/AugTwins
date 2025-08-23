@@ -33,13 +33,13 @@ class ElevenLabsRealtimeSession:
     async def connect(self) -> None:
         """Establish WebSocket connection to ElevenLabs Realtime API."""
         if self.is_connected and self.websocket:
-            print(f"[TTS Debug] Already connected to voice {self.voice_id}")
+            # Already connected
             return
             
         url = f"wss://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}/stream-input?output_format=pcm_22050"
         headers = {"xi-api-key": self.api_key}
         
-        print(f"[TTS Debug] Connecting to {url} with voice {self.voice_id}")
+        # Connecting to WebSocket
         try:
             # Create SSL context for macOS compatibility
             ssl_context = ssl.create_default_context()
@@ -49,12 +49,12 @@ class ElevenLabsRealtimeSession:
             self.websocket = await websockets.connect(
                 url, additional_headers=headers, ping_interval=20, ping_timeout=10, ssl=ssl_context
             )
-            print(f"[TTS Debug] WebSocket connected successfully")
+            # Connected
             await self._configure_session()
             self.is_connected = True
-            print(f"[TTS Debug] Session configured and ready")
+            # Session ready
         except Exception as e:
-            print(f"[TTS Debug] Connection failed: {e}")
+            print(f"[TTS Error] Connection failed: {e}")
             raise
         
     async def _configure_session(self) -> None:
@@ -68,64 +68,64 @@ class ElevenLabsRealtimeSession:
             },
             "xi_api_key": self.api_key
         }
-        print(f"[TTS Debug] Sending config: {json.dumps(config, indent=2)}")
+        # Sending config
         await self.websocket.send(json.dumps(config))
-        print(f"[TTS Debug] Config sent (not waiting for response)")
+        # Config sent
                 
     async def stream_text_to_pcm(self, text: str) -> AsyncGenerator[bytes, None]:
         """Stream text to ElevenLabs and yield PCM audio chunks."""
         if not self.is_connected:
-            print(f"[TTS Debug] Not connected, connecting now...")
+            # Connecting...
             await self.connect()
             
         message = {
             "text": text,
             "try_trigger_generation": True
         }
-        print(f"[TTS Debug] Sending text message: {text[:50]}...")
+        # Sending text
         await self.websocket.send(json.dumps(message))
         
         # Send end-of-input signal
         end_message = {"text": ""}
-        print(f"[TTS Debug] Sending end-of-input signal...")
+        # End signal
         await self.websocket.send(json.dumps(end_message))
         
         chunk_count = 0
         while True:
             try:
-                print(f"[TTS Debug] Waiting for response (chunk {chunk_count})...")
+                # Waiting for response
                 response = await asyncio.wait_for(self.websocket.recv(), timeout=10.0)
                 
                 if isinstance(response, bytes) and len(response) > 0:
-                    print(f"[TTS Debug] Received audio chunk {chunk_count}: {len(response)} bytes")
+                    # Audio chunk received
                     chunk_count += 1
                     yield response
                 elif isinstance(response, str):
-                    print(f"[TTS Debug] Received text response: {response}")
+                    # Text response
                     data = json.loads(response)
                     if "audio" in data and data["audio"]:
                         # Decode base64 audio data
                         audio_bytes = base64.b64decode(data["audio"])
-                        print(f"[TTS Debug] Decoded audio chunk {chunk_count}: {len(audio_bytes)} bytes")
+                        # Decoded chunk
                         chunk_count += 1
                         yield audio_bytes
                     if data.get("isFinal"):
-                        print(f"[TTS Debug] Received isFinal, ending stream")
+                        # Stream ended
                         break
                     if "error" in data:
-                        print(f"[TTS Debug] Received error: {data['error']}")
+                        print(f"[TTS Error] {data['error']}")
                         break
                 else:
-                    print(f"[TTS Debug] Received unknown response type: {type(response)}")
+                    print(f"[TTS Error] Unknown response type: {type(response)}")
                     
             except asyncio.TimeoutError:
-                print(f"[TTS Debug] Timeout waiting for response after chunk {chunk_count}")
+                print(f"[TTS Error] Timeout after {chunk_count} chunks")
                 break
             except websockets.exceptions.ConnectionClosedOK:
-                print(f"[TTS Debug] WebSocket closed normally after {chunk_count} chunks")
+                # Stream complete
                 break
             except websockets.exceptions.ConnectionClosed as e:
-                print(f"[TTS Debug] WebSocket closed: {e}")
+                print(f"[TTS Error] Connection closed: {e}")
                 self.is_connected = False
                 break
             except Exception as e:
@@ -133,7 +133,7 @@ class ElevenLabsRealtimeSession:
                 self.is_connected = False
                 break
                 
-        print(f"[TTS Debug] Stream ended, total chunks: {chunk_count}")
+        # Stream ended
                 
     async def close(self) -> None:
         """Close the WebSocket connection."""
@@ -192,6 +192,44 @@ class RealtimeTTSManager:
             if job_id in self.active_jobs:
                 del self.active_jobs[job_id]
                 
+    def stream_tts_sync(self, text: str, voice_id: str, job_id: str = None):
+        """Synchronous wrapper for stream_tts that always runs in a separate thread."""
+        import asyncio
+        import concurrent.futures
+        
+        def run_in_isolated_thread():
+            """Run the async TTS streaming in a completely isolated thread with new manager."""
+            # Create a new event loop for this thread
+            new_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(new_loop)
+            
+            try:
+                async def collect_chunks():
+                    # Create a completely new TTS manager instance for this thread
+                    # This avoids sharing WebSocket sessions across event loops
+                    isolated_manager = RealtimeTTSManager()
+                    
+                    chunks = []
+                    async for chunk in isolated_manager.stream_tts(text, voice_id, job_id):
+                        chunks.append(chunk)
+                    
+                    # Clean up the isolated manager's sessions
+                    await isolated_manager.close_all()
+                    return chunks
+                
+                # Run the async function in the new loop
+                return new_loop.run_until_complete(collect_chunks())
+            finally:
+                # Clean up the loop
+                new_loop.close()
+                asyncio.set_event_loop(None)
+        
+        # Always run in a separate thread to avoid any loop conflicts
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(run_in_isolated_thread)
+            chunks = future.result()
+            return iter(chunks)
+    
     async def cancel_job(self, job_id: str) -> bool:
         """Cancel an active TTS job."""
         if job_id in self.active_jobs:
