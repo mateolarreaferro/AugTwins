@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import asyncio
 import json
+import base64
 import websockets
 try:
     import requests
@@ -31,20 +32,29 @@ class ElevenLabsRealtimeSession:
     async def connect(self) -> None:
         """Establish WebSocket connection to ElevenLabs Realtime API."""
         if self.is_connected and self.websocket:
+            print(f"[TTS Debug] Already connected to voice {self.voice_id}")
             return
             
         url = f"wss://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}/stream-input"
         headers = {"xi-api-key": self.api_key}
         
-        self.websocket = await websockets.connect(
-            url, additional_headers=headers, ping_interval=20, ping_timeout=10
-        )
-        await self._configure_session()
-        self.is_connected = True
+        print(f"[TTS Debug] Connecting to {url} with voice {self.voice_id}")
+        try:
+            self.websocket = await websockets.connect(
+                url, additional_headers=headers, ping_interval=20, ping_timeout=10
+            )
+            print(f"[TTS Debug] WebSocket connected successfully")
+            await self._configure_session()
+            self.is_connected = True
+            print(f"[TTS Debug] Session configured and ready")
+        except Exception as e:
+            print(f"[TTS Debug] Connection failed: {e}")
+            raise
         
     async def _configure_session(self) -> None:
         """Configure the session for PCM S16LE output at 22.05 kHz."""
         config = {
+            "text": " ",
             "voice_settings": {
                 "stability": 0.55,
                 "similarity_boost": 0.8,
@@ -54,16 +64,25 @@ class ElevenLabsRealtimeSession:
             "xi_api_key": self.api_key,
             "output_format": "pcm_22050"
         }
+        print(f"[TTS Debug] Sending config: {json.dumps(config, indent=2)}")
         await self.websocket.send(json.dumps(config))
+        
+        print(f"[TTS Debug] Waiting for config response...")
         response = await self.websocket.recv()
+        print(f"[TTS Debug] Received config response: {response}")
+        
         if isinstance(response, str):
             data = json.loads(response)
             if "error" in data:
                 raise Exception(f"ElevenLabs config error: {data['error']}")
+            print(f"[TTS Debug] Config successful: {data}")
+        else:
+            print(f"[TTS Debug] Received non-string response: {type(response)}")
                 
     async def stream_text_to_pcm(self, text: str) -> AsyncGenerator[bytes, None]:
         """Stream text to ElevenLabs and yield PCM audio chunks."""
         if not self.is_connected:
+            print(f"[TTS Debug] Not connected, connecting now...")
             await self.connect()
             
         message = {
@@ -71,25 +90,53 @@ class ElevenLabsRealtimeSession:
             "try_trigger_generation": True,
             "generation_config": {"chunk_length_schedule": [100]}
         }
+        print(f"[TTS Debug] Sending text message: {text[:50]}...")
         await self.websocket.send(json.dumps(message))
         
+        chunk_count = 0
         while True:
             try:
-                response = await asyncio.wait_for(self.websocket.recv(), timeout=5.0)
+                print(f"[TTS Debug] Waiting for response (chunk {chunk_count})...")
+                response = await asyncio.wait_for(self.websocket.recv(), timeout=10.0)
+                
                 if isinstance(response, bytes) and len(response) > 0:
+                    print(f"[TTS Debug] Received audio chunk {chunk_count}: {len(response)} bytes")
+                    chunk_count += 1
                     yield response
                 elif isinstance(response, str):
+                    print(f"[TTS Debug] Received text response: {response}")
                     data = json.loads(response)
-                    if data.get("isFinal") or "error" in data:
+                    if "audio" in data and data["audio"]:
+                        # Decode base64 audio data
+                        audio_bytes = base64.b64decode(data["audio"])
+                        print(f"[TTS Debug] Decoded audio chunk {chunk_count}: {len(audio_bytes)} bytes")
+                        chunk_count += 1
+                        yield audio_bytes
+                    if data.get("isFinal"):
+                        print(f"[TTS Debug] Received isFinal, ending stream")
                         break
+                    if "error" in data:
+                        print(f"[TTS Debug] Received error: {data['error']}")
+                        break
+                else:
+                    print(f"[TTS Debug] Received unknown response type: {type(response)}")
+                    
             except asyncio.TimeoutError:
+                print(f"[TTS Debug] Timeout waiting for response after chunk {chunk_count}")
                 break
             except websockets.exceptions.ConnectionClosedOK:
-                # Normal WebSocket closure, not an error
+                print(f"[TTS Debug] WebSocket closed normally after {chunk_count} chunks")
+                break
+            except websockets.exceptions.ConnectionClosed as e:
+                print(f"[TTS Debug] WebSocket closed: {e}")
+                self.is_connected = False
                 break
             except Exception as e:
-                print(f"[TTS Stream Error] {e}")
+                print(f"[TTS Stream Error] Unexpected error: {type(e).__name__}: {e}")
+                self.is_connected = False
                 break
+                
+        print(f"[TTS Debug] Stream ended, total chunks: {chunk_count}")
                 
     async def close(self) -> None:
         """Close the WebSocket connection."""
