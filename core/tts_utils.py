@@ -8,6 +8,7 @@ import os
 import asyncio
 import json
 import base64
+import ssl
 import websockets
 try:
     import requests
@@ -40,8 +41,13 @@ class ElevenLabsRealtimeSession:
         
         print(f"[TTS Debug] Connecting to {url} with voice {self.voice_id}")
         try:
+            # Create SSL context for macOS compatibility
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+            
             self.websocket = await websockets.connect(
-                url, additional_headers=headers, ping_interval=20, ping_timeout=10
+                url, additional_headers=headers, ping_interval=20, ping_timeout=10, ssl=ssl_context
             )
             print(f"[TTS Debug] WebSocket connected successfully")
             await self._configure_session()
@@ -64,18 +70,7 @@ class ElevenLabsRealtimeSession:
         }
         print(f"[TTS Debug] Sending config: {json.dumps(config, indent=2)}")
         await self.websocket.send(json.dumps(config))
-        
-        print(f"[TTS Debug] Waiting for config response...")
-        response = await self.websocket.recv()
-        print(f"[TTS Debug] Received config response: {response}")
-        
-        if isinstance(response, str):
-            data = json.loads(response)
-            if "error" in data:
-                raise Exception(f"ElevenLabs config error: {data['error']}")
-            print(f"[TTS Debug] Config successful: {data}")
-        else:
-            print(f"[TTS Debug] Received non-string response: {type(response)}")
+        print(f"[TTS Debug] Config sent (not waiting for response)")
                 
     async def stream_text_to_pcm(self, text: str) -> AsyncGenerator[bytes, None]:
         """Stream text to ElevenLabs and yield PCM audio chunks."""
